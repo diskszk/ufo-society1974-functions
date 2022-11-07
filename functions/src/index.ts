@@ -1,37 +1,29 @@
-import * as functions from "firebase-functions";
+import { https } from "firebase-functions";
 import * as admin from "firebase-admin";
+import { ALBUMS } from "./constants";
+import { fetchAlbums } from "./query";
+import * as cors from "cors";
 
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
-//
-export const helloWorld = functions.https.onRequest((request, response) => {
-  functions.logger.info("Hello logs!", { structuredData: true });
-  response.send("Hello from Firebase!");
-});
+cors;
 
 admin.initializeApp();
 
-// eg.
-export const getAlbums = functions.https.onRequest(async (_req, res) => {
-  const snapshots = await admin.firestore().collection("albums").get();
+export const albumsRef = admin.firestore().collection(ALBUMS);
+export const albums = https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.set("Access-Control-Allow-Methods", ["GET"]);
+  // if (req.method !== "GET") {
+  //   res.status(405);
+  // }
 
-  const albums: Album[] = snapshots.docs.map((snapshot) => {
-    const doc = snapshot.data();
+  try {
+    const albums = await fetchAlbums();
 
-    return {
-      description: doc.description,
-      id: snapshot.id,
-      publishedDate: doc.publishedDate,
-      title: doc.title,
-    };
-  });
-
-  res.json({ albums });
+    res.json({ albums });
+  } catch (err) {
+    res.status(500);
+    if (err instanceof Error) {
+      res.json({ err: err.message });
+    }
+  }
 });
-
-export type Album = {
-  description: string;
-  id: string; // random
-  publishedDate: string; // YYYY-MM-DD
-  title: string;
-};
