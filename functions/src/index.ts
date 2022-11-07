@@ -1,37 +1,25 @@
-import * as functions from "firebase-functions";
+import { https } from "firebase-functions";
 import * as admin from "firebase-admin";
-
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
-//
-export const helloWorld = functions.https.onRequest((request, response) => {
-  functions.logger.info("Hello logs!", { structuredData: true });
-  response.send("Hello from Firebase!");
-});
+import { ALBUMS } from "./constants";
+import { fetchAlbums } from "./query";
 
 admin.initializeApp();
 
-// eg.
-export const getAlbums = functions.https.onRequest(async (_req, res) => {
-  const snapshots = await admin.firestore().collection("albums").get();
+export const albumsRef = admin.firestore().collection(ALBUMS);
 
-  const albums: Album[] = snapshots.docs.map((snapshot) => {
-    const doc = snapshot.data();
+export const albums = https.onRequest(async (req, res) => {
+  if (req.method !== "GET") {
+    res.status(405);
+  }
 
-    return {
-      description: doc.description,
-      id: snapshot.id,
-      publishedDate: doc.publishedDate,
-      title: doc.title,
-    };
-  });
+  try {
+    const albums = await fetchAlbums();
 
-  res.json({ albums });
+    res.json({ albums });
+  } catch (err) {
+    res.status(500);
+    if (err instanceof Error) {
+      res.json({ err: err.message });
+    }
+  }
 });
-
-export type Album = {
-  description: string;
-  id: string; // random
-  publishedDate: string; // YYYY-MM-DD
-  title: string;
-};
