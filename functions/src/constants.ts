@@ -1,1 +1,1 @@
-export const ALBUMS = "albums" as const;
+export const PUBLISHED_ALBUMS = "published_albums" as const;

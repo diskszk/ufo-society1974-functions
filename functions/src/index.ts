@@ -1,29 +1,32 @@
 import { https } from "firebase-functions";
 import * as admin from "firebase-admin";
-import { ALBUMS } from "./constants";
-import { fetchAlbums } from "./query";
+import * as express from "express";
 import * as cors from "cors";
-
-cors;
+import { getAlbums } from "./albums/getAlbums";
+import { PUBLISHED_ALBUMS } from "./constants";
 
 admin.initializeApp();
 
-export const albumsRef = admin.firestore().collection(ALBUMS);
-export const albums = https.onRequest(async (req, res) => {
-  res.set("Access-Control-Allow-Origin", "http://localhost:3000");
-  res.set("Access-Control-Allow-Methods", ["GET"]);
-  // if (req.method !== "GET") {
-  //   res.status(405);
-  // }
+const app = express();
+app.use(cors());
 
+const db = admin.firestore();
+export const refs = {
+  albumsRef: db.collection(PUBLISHED_ALBUMS),
+};
+
+app.get("/albums", async (req, res) => {
   try {
-    const albums = await fetchAlbums();
-
-    res.json({ albums });
+    const albums = await getAlbums();
+    res.json(albums);
   } catch (err) {
     res.status(500);
     if (err instanceof Error) {
-      res.json({ err: err.message });
+      res.json(err);
     }
   }
 });
+
+const api = https.onRequest(app);
+
+export { api };
