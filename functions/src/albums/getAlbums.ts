@@ -1,6 +1,6 @@
 import { Album } from "ufo-society1974-definition-types";
 import { refs } from "../index";
-import { albumConverter } from "./converter";
+import { albumConverter } from "../converter";
 
 export async function getAlbums(): Promise<Album[]> {
   const snapshots = await refs.albumsRef
