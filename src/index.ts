@@ -1,18 +1,16 @@
-import { https } from "firebase-functions";
-import * as admin from "firebase-admin";
+import { NestFactory } from "@nestjs/core";
+import { ExpressAdapter } from "@nestjs/platform-express";
 import * as express from "express";
+import * as functions from "firebase-functions";
+import * as admin from "firebase-admin";
+
 import helmet from "helmet";
 import * as cors from "cors";
-import { getAlbums } from "./albums/getAlbums";
+
 import { PUBLISHED_ALBUMS, SONGS } from "./constants";
-import { getAlbum } from "./album/getAlbum";
-import { getSongs } from "./songs/getSongs";
+import { AppModule } from "./app.module";
 
 admin.initializeApp();
-
-const app = express();
-app.use(helmet());
-app.use(cors());
 
 const db = admin.firestore();
 export const refs = {
@@ -21,51 +19,19 @@ export const refs = {
     db.collection(PUBLISHED_ALBUMS).doc(albumId).collection(SONGS),
 };
 
-app.get("/albums", async (req, res) => {
-  try {
-    const albums = await getAlbums();
-    res.json(albums);
-  } catch (err) {
-    res.status(500);
-    if (err instanceof Error) {
-      res.json(err);
-    }
-  }
-});
+const server = express();
 
-app.get("/albums/:albumId", async (req, res) => {
-  try {
-    const album = await getAlbum(req.params.albumId);
-    if (!album) {
-      res.status(404);
-      return;
-    }
-    res.json(album);
-  } catch (err) {
-    res.status(500);
-    if (err instanceof Error) {
-      res.json(err);
-    }
-  }
-});
+server.use(helmet());
+server.use(cors());
 
-app.get("/albums/:albumId/songs", async (req, res) => {
-  try {
-    const songs = await getSongs(req.params.albumId);
-    if (!songs) {
-      res.status(404);
-      return;
-    }
+const promiseApplicationReady = NestFactory.create(
+  AppModule,
+  new ExpressAdapter(server)
+).then((app) => app.init());
 
-    res.json(songs);
-  } catch (err) {
-    res.status(500);
-    if (err instanceof Error) {
-      res.json(err);
-    }
-  }
-});
-
-const api = https.onRequest(app);
-
-export { api };
+export const api = functions
+  .region("asia-northeast2")
+  .https.onRequest(async (...args) => {
+    await promiseApplicationReady;
+    server(...args);
+  });
