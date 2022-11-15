@@ -1,7 +1,7 @@
 {
   "functions": [
     {
-      "source": "ufo-society1974-functions",
+      "source": "./",
       "codebase": "default",
       "ignore": [
         "node_modules",
