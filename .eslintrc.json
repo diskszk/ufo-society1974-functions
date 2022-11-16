@@ -2,7 +2,8 @@
   "root": true,
   "env": {
     "es6": true,
-    "node": true
+    "node": true,
+    "jest": true
   },
   "extends": [
     "eslint:recommended",
@@ -20,12 +21,22 @@
   "ignorePatterns": [
     "/lib/**/*" // Ignore built files.
   ],
-  "plugins": ["@typescript-eslint", "import"],
+  "plugins": [
+    "@typescript-eslint",
+    "@typescript-eslint/eslint-plugin",
+    "import"
+  ],
   "rules": {
     "indent": "off",
     "quotes": ["error", "double"],
     "object-curly-spacing": "off",
     "import/no-unresolved": 0,
-    "require-jsdoc": "off"
+    "require-jsdoc": "off",
+    "@typescript-eslint/interface-name-prefix": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "eslint-disable-next-line": "off",
+    "new-cap": "off"
   }
 }
