@@ -9,9 +9,9 @@ const { db } = connectFirestore();
 
 @Injectable()
 export class AlbumsService {
-  async getAlbums(): Promise<Album[]> {
-    const snapshots = await db
-      .collection(PUBLISHED_ALBUMS)
+  async findAll(): Promise<Album[]> {
+    const albumsRef = db.collection(PUBLISHED_ALBUMS);
+    const snapshots = await albumsRef
       .orderBy(PUBLISHED_DATE, "desc")
       .withConverter(albumConverter)
       .get();

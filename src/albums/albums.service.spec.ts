@@ -14,7 +14,7 @@ describe("AlbumsService", () => {
     albumsService = module.get<AlbumsService>(AlbumsService);
 
     fakeAlbumsService = {
-      getAlbums: async () => {
+      findAll: async () => {
         return [...mockAlbums];
       },
     };
@@ -24,9 +24,9 @@ describe("AlbumsService", () => {
     expect(albumsService).toBeDefined();
   });
 
-  describe("getAlbums", () => {
+  describe("findAll", () => {
     it("存在する場合、album配列を返す", async () => {
-      const albums = await fakeAlbumsService.getAlbums();
+      const albums = await fakeAlbumsService.findAll();
 
       expect(albums).toHaveLength(2);
       expect(albums[0].title).toBe("test title 1");

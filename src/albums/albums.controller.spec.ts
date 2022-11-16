@@ -7,7 +7,7 @@ describe("AlbumsController", () => {
   let albumsController: AlbumsController;
 
   const mockAlbumsService = {
-    getAlbums: jest.fn().mockResolvedValue(mockAlbums),
+    findAll: jest.fn().mockResolvedValue(mockAlbums),
   };
 
   beforeEach(async () => {
@@ -28,7 +28,7 @@ describe("AlbumsController", () => {
 
   describe("/albums", () => {
     it("album配列を返すこと", async () => {
-      const albums = await albumsController.getAlbums();
+      const albums = await albumsController.fetchAlbums();
 
       expect(albums).toHaveLength(2);
       expect(albums[0].title).toBe("test title 1");
