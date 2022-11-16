@@ -8,6 +8,7 @@ describe("AlbumsController", () => {
 
   const mockAlbumsService = {
     findAll: jest.fn().mockResolvedValue(mockAlbums),
+    findById: jest.fn().mockResolvedValue(mockAlbums[0]),
   };
 
   beforeEach(async () => {
@@ -32,6 +33,13 @@ describe("AlbumsController", () => {
 
       expect(albums).toHaveLength(2);
       expect(albums[0].title).toBe("test title 1");
+    });
+  });
+
+  describe("/albums/:id", () => {
+    it("アルバムが存在する場合、アルバムを返すこと", async () => {
+      const album = await albumsController.findAlbumById("sample001");
+      expect(album.title).toBe("test title 1");
     });
   });
 });

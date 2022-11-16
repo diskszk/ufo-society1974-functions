@@ -9,9 +9,10 @@ const { db } = connectFirestore();
 
 @Injectable()
 export class AlbumsService {
+  private readonly albumsRef = db.collection(PUBLISHED_ALBUMS);
+
   async findAll(): Promise<Album[]> {
-    const albumsRef = db.collection(PUBLISHED_ALBUMS);
-    const snapshots = await albumsRef
+    const snapshots = await this.albumsRef
       .orderBy(PUBLISHED_DATE, "desc")
       .withConverter(albumConverter)
       .get();
@@ -22,5 +23,20 @@ export class AlbumsService {
       return { ...doc, id: snapshot.id };
     });
     return albums;
+  }
+
+  async findById(id: string): Promise<Album | null> {
+    const snapshot = await this.albumsRef
+      .doc(id)
+      .withConverter(albumConverter)
+      .get();
+
+    if (!snapshot.exists) {
+      return null;
+    }
+
+    const doc = snapshot.data();
+
+    return { ...doc, id: snapshot.id };
   }
 }

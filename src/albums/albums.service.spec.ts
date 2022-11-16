@@ -17,6 +17,9 @@ describe("AlbumsService", () => {
       findAll: async () => {
         return [...mockAlbums];
       },
+      findById: async (id: string) => {
+        return mockAlbums.find((mockAlbum) => mockAlbum.id === id) || null;
+      },
     };
   });
 
@@ -30,6 +33,19 @@ describe("AlbumsService", () => {
 
       expect(albums).toHaveLength(2);
       expect(albums[0].title).toBe("test title 1");
+    });
+  });
+
+  describe("findById", () => {
+    it("存在する場合、取得したアルバムを返す", async () => {
+      const album = await fakeAlbumsService.findById("sample01");
+      expect(album.id).toBe("sample01");
+      expect(album.title).toBe("test title 1");
+    });
+
+    it("存在しない場合、nullを返す", async () => {
+      const album = await fakeAlbumsService.findById("sample009");
+      expect(album).toBeNull();
     });
   });
 });
