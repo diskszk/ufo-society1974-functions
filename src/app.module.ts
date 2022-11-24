@@ -1,9 +1,12 @@
 import { Module } from "@nestjs/common";
-import { AlbumsModule } from "./albums/albums.module";
+import { AuthModule } from "./guard/auth.module";
+import { AppController } from "./app.controller";
 
 @Module({
-  imports: [AlbumsModule],
-  controllers: [],
+  imports: [AuthModule],
+  // TODO: initializeApp()を一箇所で行う
+  // imports: [AlbumsModule, AuthModule],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule {}
