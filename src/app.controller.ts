@@ -1,15 +1,21 @@
 import { Controller, Get, UseGuards } from "@nestjs/common";
-import { logger } from "firebase-functions/v1";
+import { UserInfo } from "firebase-admin/auth";
 import { UserGuardDecorator } from "./decorators/UserGuardDecorator";
 import { AuthGuard } from "./guard/auth.guard";
+import { UsersService } from "./users/users.service";
 
 @Controller("app")
 export class AppController {
+  constructor(private readonly usersService: UsersService) {}
+
   @Get("user")
   @UseGuards(AuthGuard)
-  getHello(@UserGuardDecorator() user: any) {
-    console.log(user);
-    logger.log(user);
+  async getHello(@UserGuardDecorator() user: UserInfo) {
+    const id = user.uid;
+    await this.usersService.findOne(id).then((res) => {
+      console.log("res", res);
+    });
+
     return user;
   }
 

@@ -16,6 +16,7 @@ export class AuthService {
 
     try {
       const user = await admin.auth().verifyIdToken(idToken);
+
       return user;
     } catch {
       throw new HttpException("Forbidden", 401);
