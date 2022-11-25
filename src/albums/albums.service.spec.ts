@@ -1,6 +1,11 @@
 import { Test, TestingModule } from "@nestjs/testing";
+import { initializeApp } from "firebase-admin";
 import { mockAlbums } from "../mock/albums";
 import { AlbumsService } from "./albums.service";
+
+jest.mock("firebase-admin", () => ({
+  initializeApp: jest.fn(),
+}));
 
 describe("AlbumsService", () => {
   let albumsService: AlbumsService;
@@ -23,12 +28,17 @@ describe("AlbumsService", () => {
     };
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it("should be defined", () => {
     expect(albumsService).toBeDefined();
   });
 
   describe("findAll", () => {
     it("存在する場合、album配列を返す", async () => {
+      initializeApp();
       const albums = await fakeAlbumsService.findAll();
 
       expect(albums).toHaveLength(2);
@@ -38,12 +48,16 @@ describe("AlbumsService", () => {
 
   describe("findById", () => {
     it("存在する場合、取得したアルバムを返す", async () => {
+      initializeApp();
+
       const album = await fakeAlbumsService.findById("sample01");
       expect(album.id).toBe("sample01");
       expect(album.title).toBe("test title 1");
     });
 
     it("存在しない場合、nullを返す", async () => {
+      initializeApp();
+
       const album = await fakeAlbumsService.findById("sample009");
       expect(album).toBeNull();
     });

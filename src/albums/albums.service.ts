@@ -1,32 +1,35 @@
 import { Injectable } from "@nestjs/common";
-import { albumConverter } from "../converter";
 import { Album } from "ufo-society1974-definition-types";
-
+import { albumConverter } from "../converter";
 import { PUBLISHED_ALBUMS, PUBLISHED_DATE } from "../constants";
-import { connectFirestore } from "../connectFirestore";
-
-const { db } = connectFirestore();
 
 @Injectable()
 export class AlbumsService {
-  private readonly albumsRef = db.collection(PUBLISHED_ALBUMS);
+  private db: FirebaseFirestore.Firestore;
 
   async findAll(): Promise<Album[]> {
-    const snapshots = await this.albumsRef
-      .orderBy(PUBLISHED_DATE, "desc")
-      .withConverter(albumConverter)
-      .get();
+    try {
+      const snapshots = await this.db
+        .collection(PUBLISHED_ALBUMS)
+        .orderBy(PUBLISHED_DATE, "desc")
+        .withConverter(albumConverter)
+        .get();
 
-    const albums: Album[] = snapshots.docs.map((snapshot) => {
-      const doc = snapshot.data();
+      const albums: Album[] = snapshots.docs.map((snapshot) => {
+        const doc = snapshot.data();
 
-      return { ...doc, id: snapshot.id };
-    });
-    return albums;
+        return { ...doc, id: snapshot.id };
+      });
+      return albums;
+    } catch (err) {
+      console.error(err);
+      return [];
+    }
   }
 
   async findById(id: string): Promise<Album | null> {
-    const snapshot = await this.albumsRef
+    const snapshot = await this.db
+      .collection(PUBLISHED_ALBUMS)
       .doc(id)
       .withConverter(albumConverter)
       .get();

@@ -5,8 +5,6 @@ import {
 } from "@nestjs/common";
 import * as admin from "firebase-admin";
 
-admin.initializeApp();
-
 @Injectable()
 export class AuthService {
   async validateUser(idToken: string) {
