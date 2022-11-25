@@ -12,6 +12,7 @@ describe("AlbumsService", () => {
   let fakeAlbumsService: Partial<AlbumsService>;
 
   beforeEach(async () => {
+    initializeApp();
     const module: TestingModule = await Test.createTestingModule({
       providers: [AlbumsService],
     }).compile();

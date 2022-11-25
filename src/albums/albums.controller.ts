@@ -19,17 +19,22 @@ export class AlbumsController {
 
   @Get(":albumId")
   async findAlbumById(@Param("albumId") albumId: string): Promise<Album> {
-    const album = await this.albumsService.findById(albumId);
-    if (!album) {
-      throw new HttpException(
-        {
-          status: HttpStatus.NOT_FOUND,
-          error: "Missing album id.",
-        },
-        404
-      );
-    }
+    try {
+      const album = await this.albumsService.findById(albumId);
+      if (!album) {
+        throw new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            error: "Missing album id.",
+          },
+          404
+        );
+      }
 
-    return album;
+      return album;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
   }
 }
