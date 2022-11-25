@@ -13,28 +13,23 @@ export class AlbumsController {
   constructor(private readonly albumsService: AlbumsService) {}
 
   @Get()
-  fetchAlbums(): Promise<Album[]> {
+  findAll(): Promise<Album[]> {
     return this.albumsService.findAll();
   }
 
   @Get(":albumId")
-  async findAlbumById(@Param("albumId") albumId: string): Promise<Album> {
-    try {
-      const album = await this.albumsService.findById(albumId);
-      if (!album) {
-        throw new HttpException(
-          {
-            status: HttpStatus.NOT_FOUND,
-            error: "Missing album id.",
-          },
-          404
-        );
-      }
-
-      return album;
-    } catch (err) {
-      console.error(err);
-      throw err;
+  async findById(@Param("albumId") albumId: string): Promise<Album> {
+    const album = await this.albumsService.findById(albumId);
+    if (!album) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: "Missing album id.",
+        },
+        404
+      );
     }
+
+    return album;
   }
 }
