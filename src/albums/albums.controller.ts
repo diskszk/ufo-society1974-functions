@@ -1,11 +1,14 @@
 import {
+  Body,
   Controller,
   Get,
   HttpException,
   HttpStatus,
   Param,
+  Post,
 } from "@nestjs/common";
 import { Album } from "ufo-society1974-definition-types";
+import { CreateAlbumDTO } from "./albums.dto";
 import { AlbumsService } from "./albums.service";
 
 @Controller("albums")
@@ -31,5 +34,12 @@ export class AlbumsController {
     }
 
     return album;
+  }
+
+  @Post()
+  async createAlbum(
+    @Body() album: CreateAlbumDTO
+  ): Promise<FirebaseFirestore.WriteResult> {
+    return await this.albumsService.create(album);
   }
 }
