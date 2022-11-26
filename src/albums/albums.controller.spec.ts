@@ -1,26 +1,33 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { mockAlbums } from "../mock/albums";
+import { mockData } from "../mock/";
 import { AlbumsController } from "./albums.controller";
+import { AlbumsModule } from "./albums.module";
 import { AlbumsService } from "./albums.service";
+
+class DummyAlbumsService {
+  async findAll() {
+    return [...mockData.albums];
+  }
+
+  async findById(id: string) {
+    return id === "sample001" ? mockData.albums[0] : null;
+  }
+}
 
 describe("AlbumsController", () => {
   let albumsController: AlbumsController;
-
-  const mockAlbumsService = {
-    findAll: jest.fn().mockResolvedValue(mockAlbums),
-    findById: jest.fn().mockResolvedValue(mockAlbums[0]),
-  };
+  let albumsService: AlbumsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [AlbumsController],
-      providers: [AlbumsService],
+      imports: [AlbumsModule],
     })
       .overrideProvider(AlbumsService)
-      .useValue(mockAlbumsService)
+      .useClass(DummyAlbumsService)
       .compile();
 
-    albumsController = module.get<AlbumsController>(AlbumsController);
+    albumsService = module.get<AlbumsService>(AlbumsService);
+    albumsController = new AlbumsController(albumsService);
   });
 
   it("should be defined", () => {
@@ -28,8 +35,8 @@ describe("AlbumsController", () => {
   });
 
   describe("/albums", () => {
-    it("album配列を返すこと", async () => {
-      const albums = await albumsController.fetchAlbums();
+    it("アルバム一覧を返す", async () => {
+      const albums = await albumsController.findAll();
 
       expect(albums).toHaveLength(2);
       expect(albums[0].title).toBe("test title 1");
@@ -37,9 +44,13 @@ describe("AlbumsController", () => {
   });
 
   describe("/albums/:id", () => {
-    it("アルバムが存在する場合、アルバムを返すこと", async () => {
-      const album = await albumsController.findAlbumById("sample001");
+    it("IDと一致するアルバムが存在する場合、該当するアルバムを返す", async () => {
+      const album = await albumsController.findById("sample001");
       expect(album.title).toBe("test title 1");
+    });
+
+    it("IDと一致するアルバムが存在しない場合、エラーが発生すること", async () => {
+      await expect(albumsController.findById("sample999")).rejects.toThrow();
     });
   });
 });

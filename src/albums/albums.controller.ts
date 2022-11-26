@@ -13,12 +13,12 @@ export class AlbumsController {
   constructor(private readonly albumsService: AlbumsService) {}
 
   @Get()
-  fetchAlbums(): Promise<Album[]> {
+  findAll(): Promise<Album[]> {
     return this.albumsService.findAll();
   }
 
   @Get(":albumId")
-  async findAlbumById(@Param("albumId") albumId: string): Promise<Album> {
+  async findById(@Param("albumId") albumId: string): Promise<Album> {
     const album = await this.albumsService.findById(albumId);
     if (!album) {
       throw new HttpException(

@@ -1,15 +1,23 @@
 import { Injectable } from "@nestjs/common";
+import { firestore } from "firebase-admin";
 import { Song } from "ufo-society1974-definition-types";
-import { connectFirestore } from "../connectFirestore";
 import { PUBLISHED_ALBUMS, SONGS } from "../constants";
 import { songConverter } from "../converter";
 
-const { db } = connectFirestore();
-
 @Injectable()
 export class SongsService {
+  private readonly db: firestore.Firestore;
+
+  constructor() {
+    if (process.env.NODE_ENV === "test") {
+      return;
+    } else {
+      this.db = firestore();
+    }
+  }
+
   async findAll(albumId: string): Promise<Song[]> {
-    const songsRef = db
+    const songsRef = this.db
       .collection(PUBLISHED_ALBUMS)
       .doc(albumId)
       .collection(SONGS)

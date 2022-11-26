@@ -1,5 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { mockAlbums } from "../mock/albums";
+import { mockData } from "../mock/";
 import { AlbumsService } from "./albums.service";
 
 describe("AlbumsService", () => {
@@ -15,10 +15,10 @@ describe("AlbumsService", () => {
 
     fakeAlbumsService = {
       findAll: async () => {
-        return [...mockAlbums];
+        return [...mockData.albums];
       },
       findById: async (id: string) => {
-        return mockAlbums.find((mockAlbum) => mockAlbum.id === id) || null;
+        return mockData.albums.find((mockAlbum) => mockAlbum.id === id) || null;
       },
     };
   });
@@ -28,7 +28,7 @@ describe("AlbumsService", () => {
   });
 
   describe("findAll", () => {
-    it("存在する場合、album配列を返す", async () => {
+    it("アルバム一覧を返す", async () => {
       const albums = await fakeAlbumsService.findAll();
 
       expect(albums).toHaveLength(2);
@@ -37,13 +37,13 @@ describe("AlbumsService", () => {
   });
 
   describe("findById", () => {
-    it("存在する場合、取得したアルバムを返す", async () => {
+    it("IDと一致するアルバムが存在する場合、該当するアルバムを返す", async () => {
       const album = await fakeAlbumsService.findById("sample01");
       expect(album.id).toBe("sample01");
       expect(album.title).toBe("test title 1");
     });
 
-    it("存在しない場合、nullを返す", async () => {
+    it("IDと一致するアルバムが存在しない場合、nullを返す", async () => {
       const album = await fakeAlbumsService.findById("sample009");
       expect(album).toBeNull();
     });
