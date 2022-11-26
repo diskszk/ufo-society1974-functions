@@ -1,5 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { mockData } from "../mock/";
+import { UsersService } from "../users/users.service";
 import { AlbumsController } from "./albums.controller";
 import { AlbumsModule } from "./albums.module";
 import { AlbumsService } from "./albums.service";
@@ -17,6 +18,7 @@ class DummyAlbumsService {
 describe("AlbumsController", () => {
   let albumsController: AlbumsController;
   let albumsService: AlbumsService;
+  let usersService: UsersService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -27,7 +29,8 @@ describe("AlbumsController", () => {
       .compile();
 
     albumsService = module.get<AlbumsService>(AlbumsService);
-    albumsController = new AlbumsController(albumsService);
+    usersService = module.get<UsersService>(UsersService);
+    albumsController = new AlbumsController(albumsService, usersService);
   });
 
   it("should be defined", () => {

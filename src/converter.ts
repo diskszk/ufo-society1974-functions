@@ -1,7 +1,7 @@
 import { firestore } from "firebase-admin";
 import { DocumentData, FirestoreDataConverter } from "firebase-admin/firestore";
 import { Album, Song } from "ufo-society1974-definition-types";
-import { User } from "./users/users.service";
+import { FirebaseUserInfo } from "./users/users.service";
 
 export const albumConverter: FirestoreDataConverter<Album> = {
   toFirestore(album: Album): DocumentData {
@@ -46,11 +46,11 @@ export const songConverter: FirestoreDataConverter<Song> = {
   },
 };
 
-export const userConverter: FirestoreDataConverter<User> = {
-  toFirestore(_user: User) {
+export const userConverter: FirestoreDataConverter<FirebaseUserInfo> = {
+  toFirestore(_user: FirebaseUserInfo) {
     return {};
   },
-  fromFirestore(snapshot): User {
+  fromFirestore(snapshot): FirebaseUserInfo {
     const data = snapshot.data();
 
     return {

@@ -5,7 +5,7 @@ import { USERS } from "../constants";
 import { userConverter } from "../converter";
 
 // 別のファイルに書いくべき?
-export type User = Omit<
+export type FirebaseUserInfo = Omit<
   UserInfo & {
     role: string;
   },
@@ -25,7 +25,7 @@ export class UsersService {
     this.db = firestore();
   }
 
-  async findById(id: string): Promise<User | null> {
+  async findById(id: string): Promise<FirebaseUserInfo | null> {
     const snapshot = await this.db
       .collection(USERS)
       .doc(id)

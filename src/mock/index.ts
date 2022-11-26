@@ -1,5 +1,5 @@
 import { Album, Song } from "ufo-society1974-definition-types";
-import { User } from "../users/users.service";
+import { FirebaseUserInfo } from "../users/users.service";
 
 const mockSongs: Song[] = [
   {
@@ -39,7 +39,7 @@ const mockAlbums: Album[] = [
   },
 ];
 
-const users: User[] = [
+const users: FirebaseUserInfo[] = [
   {
     uid: "testuid",
     displayName: "test name",
