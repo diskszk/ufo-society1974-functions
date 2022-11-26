@@ -1,6 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { initializeApp } from "firebase-admin";
-import { mockAlbums } from "../mock/albums";
+import { mock } from "../mock/";
 import { AlbumsService } from "./albums.service";
 
 jest.mock("firebase-admin", () => ({
@@ -22,10 +22,10 @@ describe("AlbumsService", () => {
 
     fakeAlbumsService = {
       findAll: async () => {
-        return [...mockAlbums];
+        return [...mock.albums];
       },
       findById: async (id: string) => {
-        return mockAlbums.find((mockAlbum) => mockAlbum.id === id) || null;
+        return mock.albums.find((mockAlbum) => mockAlbum.id === id) || null;
       },
     };
   });

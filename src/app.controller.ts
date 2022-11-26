@@ -12,7 +12,7 @@ export class AppController {
   @UseGuards(AuthGuard)
   async getHello(@UserGuardDecorator() user: UserInfo) {
     const id = user.uid;
-    await this.usersService.findOne(id).then((res) => {
+    await this.usersService.findById(id).then((res) => {
       console.log("res", res);
     });
 

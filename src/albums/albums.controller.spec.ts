@@ -1,16 +1,16 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { mockAlbums } from "../mock/albums";
+import { mock } from "../mock/";
 import { AlbumsController } from "./albums.controller";
 import { AlbumsModule } from "./albums.module";
 import { AlbumsService } from "./albums.service";
 
 class DummyAlbumsService {
   async findAll() {
-    return [...mockAlbums];
+    return [...mock.albums];
   }
 
   async findById(id: string) {
-    return id === "sample001" ? mockAlbums[0] : null;
+    return id === "sample001" ? mock.albums[0] : null;
   }
 }
 

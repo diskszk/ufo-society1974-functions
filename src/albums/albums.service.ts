@@ -6,7 +6,7 @@ import { firestore } from "firebase-admin";
 
 @Injectable()
 export class AlbumsService {
-  private db: FirebaseFirestore.Firestore;
+  private readonly db: FirebaseFirestore.Firestore;
 
   constructor() {
     // test時にtestを通す為
