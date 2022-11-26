@@ -14,8 +14,8 @@ describe("SongsService", () => {
     songsService = module.get<SongsService>(SongsService);
 
     fakeSongsService = {
-      findAll: async (_albumId: string) => {
-        return [...mockData.songs];
+      findAll: async (albumId: string) => {
+        return albumId === "testid" ? [...mockData.songs] : null;
       },
     };
   });
@@ -28,6 +28,11 @@ describe("SongsService", () => {
     it("存在する場合、配列を返す", async () => {
       const songs = await fakeSongsService.findAll("testid");
       expect(songs).toHaveLength(2);
+    });
+
+    it("存在しない場合、nullを返す", async () => {
+      const response = await fakeSongsService.findAll("999");
+      expect(response).toBeNull();
     });
   });
 });

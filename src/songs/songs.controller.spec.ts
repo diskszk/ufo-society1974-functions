@@ -4,8 +4,8 @@ import { SongsController } from "./songs.controller";
 import { SongsService } from "./songs.service";
 
 class DummySongsService {
-  async findAll() {
-    return [...mockData.songs];
+  async findAll(id: string) {
+    return id === "testid" ? [...mockData.songs] : null;
   }
 }
 
@@ -31,9 +31,13 @@ describe("SongsController", () => {
   });
 
   describe("/albums/:albumId/songs", () => {
-    it("アルバムが存在する場合、曲一覧を返す", async () => {
+    it("アルバムIDと一致するアルバムが存在する場合、該当するアルバムの曲一覧を返す", async () => {
       const songs = await songsController.findSongsByAlbumId("testid");
       expect(songs).toHaveLength(2);
+    });
+
+    it("アルバムIDと一致するアルバムがない場合、エラーを返す", async () => {
+      await expect(songsController.findSongsByAlbumId("999")).rejects.toThrow();
     });
   });
 });
