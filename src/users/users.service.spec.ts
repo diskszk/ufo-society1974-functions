@@ -15,11 +15,7 @@ describe("UsersService", () => {
 
     fakeUsersService = {
       findById: async (id: string) => {
-        if (id === "testuid") {
-          return { ...mockData.users[0] };
-        } else {
-          return null;
-        }
+        return id === "testuid" ? { ...mockData.users[0] } : null;
       },
     };
   });
@@ -28,14 +24,14 @@ describe("UsersService", () => {
     expect(usersService).toBeDefined();
   });
 
-  describe("fundById", () => {
-    it("存在する場合、ユーザーを返す", async () => {
+  describe("findById", () => {
+    it("IDと一致するユーザーが存在する場合、該当するユーザーを返す", async () => {
       const user = await fakeUsersService.findById("testuid");
       expect(user.uid).toBe("testuid");
       expect(user.displayName).toBe("test name");
     });
 
-    it("存在しない場合、nullを返す", async () => {
+    it("IDと一致するユーザーが存在しない場合、nullを返す", async () => {
       const user = await fakeUsersService.findById("999");
       expect(user).toBeNull();
     });

@@ -25,12 +25,12 @@ describe("SongsService", () => {
   });
 
   describe("findAll", () => {
-    it("存在する場合、配列を返す", async () => {
+    it("IDと一致するアルバムが存在する場合、該当するアルバムの曲一覧を返す", async () => {
       const songs = await fakeSongsService.findAll("testid");
       expect(songs).toHaveLength(2);
     });
 
-    it("存在しない場合、nullを返す", async () => {
+    it("IDと一致するアルバムが存在しない場合、nullを返す", async () => {
       const response = await fakeSongsService.findAll("999");
       expect(response).toBeNull();
     });

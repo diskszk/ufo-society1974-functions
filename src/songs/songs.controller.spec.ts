@@ -36,7 +36,7 @@ describe("SongsController", () => {
       expect(songs).toHaveLength(2);
     });
 
-    it("アルバムIDと一致するアルバムがない場合、エラーを返す", async () => {
+    it("アルバムIDと一致するアルバムがない場合、エラーが発生すること", async () => {
       await expect(songsController.findSongsByAlbumId("999")).rejects.toThrow();
     });
   });

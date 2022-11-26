@@ -35,7 +35,7 @@ describe("AlbumsController", () => {
   });
 
   describe("/albums", () => {
-    it("album配列を返すこと", async () => {
+    it("アルバム一覧を返す", async () => {
       const albums = await albumsController.findAll();
 
       expect(albums).toHaveLength(2);
@@ -44,12 +44,12 @@ describe("AlbumsController", () => {
   });
 
   describe("/albums/:id", () => {
-    it("アルバムが存在する場合、アルバムを返すこと", async () => {
+    it("IDと一致するアルバムが存在する場合、該当するアルバムを返す", async () => {
       const album = await albumsController.findById("sample001");
       expect(album.title).toBe("test title 1");
     });
 
-    it("アルバムが存在しない場合、エラーを返すこと", async () => {
+    it("IDと一致するアルバムが存在しない場合、エラーが発生すること", async () => {
       await expect(albumsController.findById("sample999")).rejects.toThrow();
     });
   });
