@@ -1,19 +1,10 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { initializeApp } from "firebase-admin";
-import { mock } from "../mock";
+import { mockData } from "../mock";
 import { SongsService } from "./songs.service";
-
-jest.mock("firebase-admin", () => {
-  return { initializeApp: jest.fn() };
-});
 
 describe("SongsService", () => {
   let songsService: SongsService;
   let fakeSongsService: Partial<SongsService>;
-
-  beforeAll(() => {
-    initializeApp();
-  });
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -24,7 +15,7 @@ describe("SongsService", () => {
 
     fakeSongsService = {
       findAll: async (_albumId: string) => {
-        return [...mock.songs];
+        return [...mockData.songs];
       },
     };
   });

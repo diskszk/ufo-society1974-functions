@@ -1,11 +1,11 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { mock } from "../mock";
+import { mockData } from "../mock";
 import { SongsController } from "./songs.controller";
 import { SongsService } from "./songs.service";
 
 class DummySongsService {
   async findAll() {
-    return [...mock.songs];
+    return [...mockData.songs];
   }
 }
 
@@ -37,4 +37,3 @@ describe("SongsController", () => {
     });
   });
 });
-

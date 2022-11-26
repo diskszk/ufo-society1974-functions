@@ -1,19 +1,12 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { initializeApp } from "firebase-admin";
-import { mock } from "../mock/";
+import { mockData } from "../mock/";
 import { AlbumsService } from "./albums.service";
-
-jest.mock("firebase-admin", () => ({
-  initializeApp: jest.fn(),
-}));
 
 describe("AlbumsService", () => {
   let albumsService: AlbumsService;
   let fakeAlbumsService: Partial<AlbumsService>;
 
   beforeEach(async () => {
-    initializeApp();
-
     const module: TestingModule = await Test.createTestingModule({
       providers: [AlbumsService],
     }).compile();
@@ -22,16 +15,12 @@ describe("AlbumsService", () => {
 
     fakeAlbumsService = {
       findAll: async () => {
-        return [...mock.albums];
+        return [...mockData.albums];
       },
       findById: async (id: string) => {
-        return mock.albums.find((mockAlbum) => mockAlbum.id === id) || null;
+        return mockData.albums.find((mockAlbum) => mockAlbum.id === id) || null;
       },
     };
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
   });
 
   it("should be defined", () => {

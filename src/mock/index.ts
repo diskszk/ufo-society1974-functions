@@ -58,7 +58,7 @@ const users: User[] = [
   },
 ];
 
-export const mock = {
+export const mockData = {
   songs: mockSongs,
   albums: mockAlbums,
   users,
