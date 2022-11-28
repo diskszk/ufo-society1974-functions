@@ -11,7 +11,7 @@ import {
 import { Album } from "ufo-society1974-definition-types";
 import { UserGuardDecorator } from "../decorators/UserGuardDecorator";
 import { AuthGuard } from "../guard/auth.guard";
-import { FirebaseUserInfo, UsersService } from "../users/users.service";
+import { UsersService } from "../users/users.service";
 import { CreateAlbumDTO } from "./albums.dto";
 import { AlbumsService } from "./albums.service";
 
@@ -41,9 +41,11 @@ export class AlbumsController {
   @UseGuards(AuthGuard)
   async createAlbum(
     @Body() album: CreateAlbumDTO,
-    @UserGuardDecorator() userInfo: FirebaseUserInfo
+    @UserGuardDecorator() uid: string
   ): Promise<FirebaseFirestore.WriteResult> {
-    const user = await this.usersService.findById(userInfo.uid);
+    // パラメータからuidを取得したuidでuserをfirestoreから取得し、
+    // 取得したuser.roleでバリデーションを行う
+    const user = await this.usersService.findById(uid);
 
     if (!user) {
       throw new HttpException("User Not Found", HttpStatus.NOT_FOUND);

@@ -1,6 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { mockData } from "../mock/";
-import { FirebaseUserInfo, UsersService } from "../users/users.service";
+import { UserIdAndRole } from "../types";
+import { UsersService } from "../users/users.service";
 import { AlbumsController } from "./albums.controller";
 import { CreateAlbumDTO } from "./albums.dto";
 import { AlbumsModule } from "./albums.module";
@@ -23,13 +24,10 @@ class DummyAlbumsService {
 }
 
 class DummyUsersService {
-  async findById(id: string): Promise<FirebaseUserInfo> {
-    return {
-      uid: "sample",
-      displayName: "sample user",
-      role: "watcher",
-      email: "sample@sample.com",
-    };
+  // 正常系のテストが難しく行わない
+  // 異常系だけテストするため無条件でuserを返すようにしている
+  async findById(id: string): Promise<UserIdAndRole> {
+    return mockData.user.watcher;
   }
 }
 
@@ -65,13 +63,10 @@ describe("AlbumsController", () => {
       expect(albums[0].title).toBe("test title 1");
     });
 
-    it("ユーザーのロールがeditorで無い場合、エラーを発生させること", async () => {
-      const album = mockData.albums[0];
-      const user = mockData.users[0];
-
-      await expect(albumsController.createAlbum(album, user)).rejects.toThrow(
-        /Forbidden/
-      );
+    it("ユーザーのロールがeditorでない場合、エラーを発生させること", async () => {
+      await expect(
+        albumsController.createAlbum(mockData.album, "testuid:watcher")
+      ).rejects.toThrow(/Forbidden/);
     });
   });
 

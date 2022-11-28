@@ -1,7 +1,6 @@
 import { IsNotEmpty, IsString } from "class-validator";
 import { Album } from "ufo-society1974-definition-types";
 
-// idをOmitしたAlbum型をimplementsする
 type AlbumDTO = Omit<Album, "id">;
 
 // クライアントから受け取るデータの型チェックを行う

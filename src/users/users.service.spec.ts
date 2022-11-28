@@ -1,5 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { mockData } from "../mock";
+import { role } from "../constants";
 import { UsersService } from "./users.service";
 
 describe("UsersService", () => {
@@ -15,7 +15,7 @@ describe("UsersService", () => {
 
     fakeUsersService = {
       findById: async (id: string) => {
-        return id === "testuid" ? { ...mockData.users[0] } : null;
+        return id === "testuid" ? { uid: "testuid", role: role.EDITOR } : null;
       },
     };
   });
@@ -28,7 +28,6 @@ describe("UsersService", () => {
     it("IDと一致するユーザーが存在する場合、該当するユーザーを返す", async () => {
       const user = await fakeUsersService.findById("testuid");
       expect(user.uid).toBe("testuid");
-      expect(user.displayName).toBe("test name");
     });
 
     it("IDと一致するユーザーが存在しない場合、nullを返す", async () => {
