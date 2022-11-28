@@ -1,6 +1,9 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { mockData } from "../mock/";
+import { UserIdAndRole } from "../types";
+import { UsersService } from "../users/users.service";
 import { AlbumsController } from "./albums.controller";
+import { CreateAlbumDTO } from "./albums.dto";
 import { AlbumsModule } from "./albums.module";
 import { AlbumsService } from "./albums.service";
 
@@ -12,11 +15,26 @@ class DummyAlbumsService {
   async findById(id: string) {
     return id === "sample001" ? mockData.albums[0] : null;
   }
+
+  async create(
+    albumDTO: CreateAlbumDTO
+  ): Promise<FirebaseFirestore.DocumentReference<CreateAlbumDTO>> {
+    return null;
+  }
+}
+
+class DummyUsersService {
+  // 正常系のテストが難しく行わない
+  // 異常系だけテストするため無条件でuserを返すようにしている
+  async findById(id: string): Promise<UserIdAndRole> {
+    return mockData.user.watcher;
+  }
 }
 
 describe("AlbumsController", () => {
   let albumsController: AlbumsController;
   let albumsService: AlbumsService;
+  let usersService: UsersService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -24,10 +42,13 @@ describe("AlbumsController", () => {
     })
       .overrideProvider(AlbumsService)
       .useClass(DummyAlbumsService)
+      .overrideProvider(UsersService)
+      .useClass(DummyUsersService)
       .compile();
 
     albumsService = module.get<AlbumsService>(AlbumsService);
-    albumsController = new AlbumsController(albumsService);
+    usersService = module.get<UsersService>(UsersService);
+    albumsController = new AlbumsController(albumsService, usersService);
   });
 
   it("should be defined", () => {
@@ -41,6 +62,12 @@ describe("AlbumsController", () => {
       expect(albums).toHaveLength(2);
       expect(albums[0].title).toBe("test title 1");
     });
+
+    it("ユーザーのロールがeditorでない場合、エラーを発生させること", async () => {
+      await expect(
+        albumsController.createAlbum(mockData.album, "testuid:watcher")
+      ).rejects.toThrow(/Forbidden/);
+    });
   });
 
   describe("/albums/:id", () => {
@@ -49,8 +76,10 @@ describe("AlbumsController", () => {
       expect(album.title).toBe("test title 1");
     });
 
-    it("IDと一致するアルバムが存在しない場合、エラーが発生すること", async () => {
-      await expect(albumsController.findById("sample999")).rejects.toThrow();
+    it("IDと一致するアルバムが存在しない場合、エラーを発生させること", async () => {
+      await expect(albumsController.findById("sample999")).rejects.toThrow(
+        /Missing Album Id/
+      );
     });
   });
 });

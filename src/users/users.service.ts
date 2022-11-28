@@ -1,16 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { firestore } from "firebase-admin";
-import { UserInfo } from "firebase-admin/auth";
 import { USERS } from "../constants";
-import { userConverter } from "../converter";
-
-// 別のファイルに書いくべき?
-export type User = Omit<
-  UserInfo & {
-    role: string;
-  },
-  "photoURL" | "providerId" | "toJSON" | "phoneNumber"
->;
+import { userConverter } from "./firestoreConverter";
+import { UserIdAndRole } from "../types";
 
 @Injectable()
 export class UsersService {
@@ -25,7 +17,7 @@ export class UsersService {
     this.db = firestore();
   }
 
-  async findById(id: string): Promise<User | null> {
+  async findById(id: string): Promise<UserIdAndRole | null> {
     const snapshot = await this.db
       .collection(USERS)
       .doc(id)

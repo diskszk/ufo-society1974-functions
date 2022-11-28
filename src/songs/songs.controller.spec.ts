@@ -37,7 +37,9 @@ describe("SongsController", () => {
     });
 
     it("アルバムIDと一致するアルバムがない場合、エラーが発生すること", async () => {
-      await expect(songsController.findSongsByAlbumId("999")).rejects.toThrow();
+      await expect(songsController.findSongsByAlbumId("999")).rejects.toThrow(
+        /Missing Album Id/
+      );
     });
   });
 });

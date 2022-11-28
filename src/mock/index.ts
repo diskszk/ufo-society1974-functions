@@ -1,5 +1,6 @@
 import { Album, Song } from "ufo-society1974-definition-types";
-import { User } from "../users/users.service";
+import { role } from "../constants";
+import { UserIdAndRole } from "../types";
 
 const mockSongs: Song[] = [
   {
@@ -26,40 +27,34 @@ const mockAlbums: Album[] = [
   {
     id: "sample01",
     description: "test description1",
-    imageFile: {
-      path: "",
-      filename: "",
-    },
+    imageFile: null,
     publishedDate: "20200101",
-    songs: [],
     title: "test title 1",
-    publishPlatform: null,
   },
   {
     id: "sample02",
     description: "test description2",
-    imageFile: {
-      path: "",
-      filename: "",
-    },
+    imageFile: null,
     publishedDate: "20200101",
-    songs: [],
     title: "test title 2",
-    publishPlatform: null,
   },
 ];
 
-const users: User[] = [
-  {
-    uid: "testuid",
-    displayName: "test name",
-    email: "test@mail.com",
-    role: "editor",
-  },
+const users: UserIdAndRole[] = [
+  { uid: "testuid:editor", role: role.EDITOR },
+  { uid: "tesiuid:master", role: role.MASTER },
+  { uid: "testuid:watcher", role: role.WATCHER },
 ];
 
 export const mockData = {
   songs: mockSongs,
+  song: mockSongs[0],
   albums: mockAlbums,
-  users,
+  album: mockAlbums[0],
+  users: users,
+  user: {
+    editor: users.find((user) => user.role === role.EDITOR),
+    master: users.find((user) => user.role === role.MASTER),
+    watcher: users.find((user) => user.role === role.WATCHER),
+  },
 };

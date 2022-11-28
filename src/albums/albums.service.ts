@@ -1,8 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { Album } from "ufo-society1974-definition-types";
-import { albumConverter } from "../converter";
-import { PUBLISHED_ALBUMS, PUBLISHED_DATE } from "../constants";
+import { albumConverter } from "./firestoreConverter";
+import { ALBUMS, PUBLISHED_ALBUMS, PUBLISHED_DATE } from "../constants";
 import { firestore } from "firebase-admin";
+import { CreateAlbumDTO } from "./albums.dto";
 
 @Injectable()
 export class AlbumsService {
@@ -45,5 +46,13 @@ export class AlbumsService {
     const doc = snapshot.data();
 
     return { ...doc, id: snapshot.id };
+  }
+
+  async create(
+    album: CreateAlbumDTO
+  ): Promise<firestore.DocumentReference<CreateAlbumDTO>> {
+    const albumsRef = this.db.collection(ALBUMS);
+
+    return await albumsRef.withConverter(albumConverter).add(album);
   }
 }

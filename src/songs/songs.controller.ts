@@ -17,13 +17,7 @@ export class SongsController {
     const songs = await this.songsService.findAll(albumId);
 
     if (!songs) {
-      throw new HttpException(
-        {
-          status: HttpStatus.NOT_FOUND,
-          error: "Missing album id.",
-        },
-        404
-      );
+      throw new HttpException("Missing Album Id", HttpStatus.NOT_FOUND);
     }
 
     return songs;

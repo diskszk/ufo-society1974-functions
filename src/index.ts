@@ -8,6 +8,7 @@ import helmet from "helmet";
 import * as cors from "cors";
 
 import { AppModule } from "./app.module";
+import { ValidationPipe } from "@nestjs/common";
 admin.initializeApp();
 
 const server = express();
@@ -18,7 +19,10 @@ server.use(cors());
 const promiseApplicationReady = NestFactory.create(
   AppModule,
   new ExpressAdapter(server)
-).then((app) => app.init());
+).then((app) => {
+  app.useGlobalPipes(new ValidationPipe());
+  return app.init();
+});
 
 export const api = functions
   .region("asia-northeast2")
