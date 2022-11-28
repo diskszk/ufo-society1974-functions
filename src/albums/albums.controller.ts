@@ -31,13 +31,7 @@ export class AlbumsController {
   async findById(@Param("albumId") albumId: string): Promise<Album> {
     const album = await this.albumsService.findById(albumId);
     if (!album) {
-      throw new HttpException(
-        {
-          status: HttpStatus.NOT_FOUND,
-          error: "Missing album id.",
-        },
-        404
-      );
+      throw new HttpException("Missing Album Id", 404);
     }
 
     return album;
@@ -52,23 +46,11 @@ export class AlbumsController {
     const user = await this.usersService.findById(userInfo.uid);
 
     if (!user) {
-      throw new HttpException(
-        {
-          status: HttpStatus.NOT_FOUND,
-          error: HttpException.toString(),
-        },
-        404
-      );
+      throw new HttpException("User Not Found", HttpStatus.NOT_FOUND);
     }
 
     if (user.role !== "editor") {
-      throw new HttpException(
-        {
-          status: HttpStatus.FORBIDDEN,
-          error: HttpException.toString(),
-        },
-        403
-      );
+      throw new HttpException("Forbidden", HttpStatus.FORBIDDEN);
     }
 
     return await this.albumsService.create(album);

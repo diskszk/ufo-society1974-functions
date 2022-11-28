@@ -1,7 +1,8 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { mockData } from "../mock/";
-import { UsersService } from "../users/users.service";
+import { FirebaseUserInfo, UsersService } from "../users/users.service";
 import { AlbumsController } from "./albums.controller";
+import { CreateAlbumDTO } from "./albums.dto";
 import { AlbumsModule } from "./albums.module";
 import { AlbumsService } from "./albums.service";
 
@@ -12,6 +13,23 @@ class DummyAlbumsService {
 
   async findById(id: string) {
     return id === "sample001" ? mockData.albums[0] : null;
+  }
+
+  async create(
+    albumDTO: CreateAlbumDTO
+  ): Promise<FirebaseFirestore.WriteResult> {
+    return null;
+  }
+}
+
+class DummyUsersService {
+  async findById(id: string): Promise<FirebaseUserInfo> {
+    return {
+      uid: "sample",
+      displayName: "sample user",
+      role: "watcher",
+      email: "sample@sample.com",
+    };
   }
 }
 
@@ -26,6 +44,8 @@ describe("AlbumsController", () => {
     })
       .overrideProvider(AlbumsService)
       .useClass(DummyAlbumsService)
+      .overrideProvider(UsersService)
+      .useClass(DummyUsersService)
       .compile();
 
     albumsService = module.get<AlbumsService>(AlbumsService);
@@ -44,6 +64,15 @@ describe("AlbumsController", () => {
       expect(albums).toHaveLength(2);
       expect(albums[0].title).toBe("test title 1");
     });
+
+    it("ユーザーのロールがeditorで無い場合、エラーを発生させること", async () => {
+      const album = mockData.albums[0];
+      const user = mockData.users[0];
+
+      await expect(albumsController.createAlbum(album, user)).rejects.toThrow(
+        /Forbidden/
+      );
+    });
   });
 
   describe("/albums/:id", () => {
@@ -52,8 +81,10 @@ describe("AlbumsController", () => {
       expect(album.title).toBe("test title 1");
     });
 
-    it("IDと一致するアルバムが存在しない場合、エラーが発生すること", async () => {
-      await expect(albumsController.findById("sample999")).rejects.toThrow();
+    it("IDと一致するアルバムが存在しない場合、エラーを発生させること", async () => {
+      await expect(albumsController.findById("sample999")).rejects.toThrow(
+        /Missing Album Id/
+      );
     });
   });
 });
