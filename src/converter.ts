@@ -1,16 +1,16 @@
 import { firestore } from "firebase-admin";
 import { DocumentData, FirestoreDataConverter } from "firebase-admin/firestore";
 import { Album, Song } from "ufo-society1974-definition-types";
+import { CreateAlbumDTO } from "./albums/albums.dto";
 import { UserIdAndRole } from "./types";
 
-export const albumConverter: FirestoreDataConverter<Album> = {
-  toFirestore(album: Album): DocumentData {
+export const albumConverter: FirestoreDataConverter<CreateAlbumDTO> = {
+  toFirestore(album: CreateAlbumDTO): DocumentData {
     return {
       description: album.description,
       imageFile: album.imageFile,
       publishedDate: album.publishedDate,
       title: album.title,
-      id: album.id,
       createdAt: firestore.Timestamp.now(),
     };
   },

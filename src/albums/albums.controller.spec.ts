@@ -18,7 +18,7 @@ class DummyAlbumsService {
 
   async create(
     albumDTO: CreateAlbumDTO
-  ): Promise<FirebaseFirestore.WriteResult> {
+  ): Promise<FirebaseFirestore.DocumentReference<CreateAlbumDTO>> {
     return null;
   }
 }

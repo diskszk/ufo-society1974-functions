@@ -42,7 +42,7 @@ export class AlbumsController {
   async createAlbum(
     @Body() album: CreateAlbumDTO,
     @UserGuardDecorator() uid: string
-  ): Promise<FirebaseFirestore.WriteResult> {
+  ): Promise<FirebaseFirestore.DocumentReference<CreateAlbumDTO>> {
     // パラメータからuidを取得したuidでuserをfirestoreから取得し、
     // 取得したuser.roleでバリデーションを行う
     const user = await this.usersService.findById(uid);

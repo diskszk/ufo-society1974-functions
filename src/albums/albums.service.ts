@@ -48,14 +48,11 @@ export class AlbumsService {
     return { ...doc, id: snapshot.id };
   }
 
-  async create(album: CreateAlbumDTO): Promise<FirebaseFirestore.WriteResult> {
+  async create(
+    album: CreateAlbumDTO
+  ): Promise<firestore.DocumentReference<CreateAlbumDTO>> {
     const albumsRef = this.db.collection(ALBUMS);
 
-    const albumId = albumsRef.doc().id;
-
-    return await albumsRef
-      .doc(albumId)
-      .withConverter(albumConverter)
-      .set({ ...album, id: albumId }, { merge: true });
+    return await albumsRef.withConverter(albumConverter).add(album);
   }
 }
