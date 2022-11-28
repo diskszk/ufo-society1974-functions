@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { firestore } from "firebase-admin";
 import { USERS } from "../constants";
-import { userConverter } from "../converter";
+import { userConverter } from "./firestoreConverter";
 import { UserIdAndRole } from "../types";
 
 @Injectable()
