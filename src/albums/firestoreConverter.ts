@@ -1,8 +1,4 @@
-import {
-  DocumentData,
-  FirestoreDataConverter,
-  Timestamp,
-} from "firebase-admin/firestore";
+import { DocumentData, FirestoreDataConverter } from "firebase-admin/firestore";
 import { Album } from "ufo-society1974-definition-types";
 
 export const albumConverter: FirestoreDataConverter<Album> = {
@@ -12,7 +8,6 @@ export const albumConverter: FirestoreDataConverter<Album> = {
       imageFile: album.imageFile,
       publishedDate: album.publishedDate,
       title: album.title,
-      createdAt: Timestamp.now(),
     };
   },
   fromFirestore(snapshot): Album {

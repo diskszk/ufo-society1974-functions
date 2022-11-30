@@ -56,7 +56,9 @@ export class UsersService {
   async create(
     user: CreateUserDTO
   ): Promise<firestore.DocumentReference<User>> {
-    return await this.usersRef.withConverter(userConverter).add(user);
+    return await this.usersRef
+      .withConverter(userConverter)
+      .add({ ...user, createdAt: firestore.Timestamp.now() });
   }
 
   // delete(isDeletedをfalseにする)

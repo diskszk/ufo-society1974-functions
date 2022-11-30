@@ -1,15 +1,10 @@
-import {
-  DocumentData,
-  FirestoreDataConverter,
-  Timestamp,
-} from "firebase-admin/firestore";
+import { DocumentData, FirestoreDataConverter } from "firebase-admin/firestore";
 import { User } from "ufo-society1974-definition-types";
 
 export const userConverter: FirestoreDataConverter<User> = {
   toFirestore(user: User): DocumentData {
     return {
       ...user,
-      createdAt: Timestamp.now(),
       isDeleted: false,
     };
   },
