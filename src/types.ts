@@ -5,3 +5,5 @@ export type UserIdAndRole = {
   uid: string;
   role: typeof EDITOR | typeof MASTER | typeof WATCHER;
 };
+
+export type RoleType = typeof EDITOR | typeof MASTER | typeof WATCHER;
