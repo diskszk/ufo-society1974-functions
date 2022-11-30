@@ -1,11 +1,13 @@
 import { IsNotEmpty, IsString } from "class-validator";
 import { Album } from "ufo-society1974-definition-types";
 
-type AlbumDTO = Omit<Album, "id">;
-
 // クライアントから受け取るデータの型チェックを行う
 // id, createdAtはfirestoreで生成するため含めない
-export class CreateAlbumDTO implements AlbumDTO {
+export class CreateAlbumDTO implements Album {
+  @IsNotEmpty()
+  @IsString()
+  id: string;
+
   @IsNotEmpty()
   @IsString()
   description: string;

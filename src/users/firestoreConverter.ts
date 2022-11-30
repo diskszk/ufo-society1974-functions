@@ -1,16 +1,29 @@
-import { FirestoreDataConverter } from "firebase-admin/firestore";
-import { UserIdAndRole } from "../types";
+import {
+  DocumentData,
+  FirestoreDataConverter,
+  Timestamp,
+} from "firebase-admin/firestore";
+import { User } from "ufo-society1974-definition-types";
 
-export const userConverter: FirestoreDataConverter<UserIdAndRole> = {
-  toFirestore(_user: UserIdAndRole) {
-    return {};
+export const userConverter: FirestoreDataConverter<User> = {
+  toFirestore(user: User): DocumentData {
+    return {
+      ...user,
+      createdAt: Timestamp.now(),
+      isDeleted: false,
+    };
   },
-  fromFirestore(snapshot): UserIdAndRole {
+
+  fromFirestore(snapshot): User {
     const data = snapshot.data();
 
     return {
-      uid: data.uid,
+      email: data.email,
+      isDeleted: data.isDeleted,
+      isSignedIn: data.isSignedIn,
       role: data.role,
+      uid: data.uid,
+      username: data.username,
     };
   },
 };
