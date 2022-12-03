@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common";
 import { firestore } from "firebase-admin";
 import { USERS } from "../constants";
 import { userConverter } from "./firestoreConverter";
-import { UserIdAndRole } from "../types";
 import { User } from "ufo-society1974-definition-types";
 import { CreateUserDTO } from "./users.dto";
 
@@ -23,7 +22,11 @@ export class UsersService {
   }
 
   async findAll(): Promise<User[]> {
-    const snapshots = await this.usersRef.withConverter(userConverter).get();
+    // 未削除のユーザーのみを取得する
+    const snapshots = await this.usersRef
+      .where("isDeleted", "==", false)
+      .withConverter(userConverter)
+      .get();
 
     if (snapshots.empty) {
       return [];
@@ -36,7 +39,7 @@ export class UsersService {
     });
   }
 
-  async findById(id: string): Promise<UserIdAndRole | null> {
+  async findById(id: string): Promise<User | null> {
     const snapshot = await this.usersRef
       .doc(id)
       .withConverter(userConverter)
@@ -62,8 +65,15 @@ export class UsersService {
   }
 
   // delete(isDeletedをfalseにする)
-  async delete(id: string) {
-    return await this.usersRef.withConverter(userConverter).doc(id).update({
+  async delete(id: string): Promise<firestore.WriteResult> {
+    const ref = this.usersRef.doc(id);
+
+    const document = await ref.get();
+    if (!document.exists) {
+      return Promise.reject(new Error("Not Found User"));
+    }
+
+    return await ref.withConverter(userConverter).update({
       isDeleted: true,
     });
   }
