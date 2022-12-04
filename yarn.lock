@@ -5943,10 +5943,10 @@ typescript@^4.5.4:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.8.4.tgz#c464abca159669597be5f96b8943500b238e60e6"
   integrity sha512-QCh+85mCy+h0IGff8r5XWzOVSbBO+KfeYrMQh7NJ58QujwcE22u+NUSmUxqF+un70P9GXKxa2HCNiTTMJknyjQ==
 
-ufo-society1974-definition-types@^0.1.4:
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/ufo-society1974-definition-types/-/ufo-society1974-definition-types-0.1.4.tgz#19ec44fc87ac6209b1508d5370567d2b8d71dc58"
-  integrity sha512-hUZDAlN3zpl24CmDTH02CJiLaARLDipeYYzzVPe1IKih89XgivhSuuCiHsQfGQ6GfP9ovZXLSvk2A6E+aKymOg==
+ufo-society1974-definition-types@^0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/ufo-society1974-definition-types/-/ufo-society1974-definition-types-0.1.5.tgz#b10f720f2fe91866ee4a42ed0047f1a02009a265"
+  integrity sha512-c9MZ1jmul0QWPjhawJsWEpQe/pV9+gmJ2dbGcQ7Xu8i7RJO/EZ+Hi/f+mShy7UqnrdIM37D5aLKKxf+iGq7ltA==
 
 unbox-primitive@^1.0.2:
   version "1.0.2"

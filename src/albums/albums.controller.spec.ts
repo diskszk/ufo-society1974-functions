@@ -1,7 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { mockData } from "../mock/";
-import { UserIdAndRole } from "../types";
-import { UsersService } from "../users/users.service";
 import { AlbumsController } from "./albums.controller";
 import { CreateAlbumDTO } from "./albums.dto";
 import { AlbumsModule } from "./albums.module";
@@ -23,18 +21,9 @@ class DummyAlbumsService {
   }
 }
 
-class DummyUsersService {
-  // 正常系のテストが難しく行わない
-  // 異常系だけテストするため無条件でuserを返すようにしている
-  async findById(id: string): Promise<UserIdAndRole> {
-    return mockData.user.watcher;
-  }
-}
-
 describe("AlbumsController", () => {
   let albumsController: AlbumsController;
   let albumsService: AlbumsService;
-  let usersService: UsersService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -42,13 +31,10 @@ describe("AlbumsController", () => {
     })
       .overrideProvider(AlbumsService)
       .useClass(DummyAlbumsService)
-      .overrideProvider(UsersService)
-      .useClass(DummyUsersService)
       .compile();
 
     albumsService = module.get<AlbumsService>(AlbumsService);
-    usersService = module.get<UsersService>(UsersService);
-    albumsController = new AlbumsController(albumsService, usersService);
+    albumsController = new AlbumsController(albumsService);
   });
 
   it("should be defined", () => {
@@ -61,12 +47,6 @@ describe("AlbumsController", () => {
 
       expect(albums).toHaveLength(2);
       expect(albums[0].title).toBe("test title 1");
-    });
-
-    it("ユーザーのロールがeditorでない場合、エラーを発生させること", async () => {
-      await expect(
-        albumsController.createAlbum(mockData.album, "testuid:watcher")
-      ).rejects.toThrow(/Forbidden/);
     });
   });
 

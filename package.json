@@ -16,6 +16,9 @@
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
     "test": "jest",
+    "test:o": "jest --onlyChanged",
+    "test:f": "jest --onlyFailures",
+    "test:cc": "jest --clearCache",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage"
   },
@@ -86,7 +89,7 @@
     "ts-node": "^10.0.0",
     "tsconfig-paths": "^3.10.1",
     "typescript": "^4.5.4",
-    "ufo-society1974-definition-types": "^0.1.4"
+    "ufo-society1974-definition-types": "^0.1.5"
   },
   "private": true
 }

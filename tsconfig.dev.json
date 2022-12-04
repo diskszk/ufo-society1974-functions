@@ -1,5 +1,7 @@
 {
-  "include": [
-    ".eslintrc.js"
-  ]
+  "include": [".eslintrc.js"],
+  "compilerOptions": {
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  }
 }

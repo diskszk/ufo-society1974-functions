@@ -53,6 +53,8 @@ export class AlbumsService {
   ): Promise<firestore.DocumentReference<CreateAlbumDTO>> {
     const albumsRef = this.db.collection(ALBUMS);
 
-    return await albumsRef.withConverter(albumConverter).add(album);
+    return await albumsRef
+      .withConverter(albumConverter)
+      .add({ ...album, createdAt: firestore.Timestamp.now() });
   }
 }

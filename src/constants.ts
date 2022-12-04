@@ -8,4 +8,4 @@ export const role = {
   MASTER: "master",
   EDITOR: "editor",
   WATCHER: "watcher",
-};
+} as const;

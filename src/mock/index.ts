@@ -1,6 +1,6 @@
-import { Album, Song } from "ufo-society1974-definition-types";
+import type { Album, Song, User } from "ufo-society1974-definition-types";
 import { role } from "../constants";
-import { UserIdAndRole } from "../types";
+import { RoleType } from "../types";
 
 const mockSongs: Song[] = [
   {
@@ -40,10 +40,27 @@ const mockAlbums: Album[] = [
   },
 ];
 
-const users: UserIdAndRole[] = [
-  { uid: "testuid:editor", role: role.EDITOR },
-  { uid: "tesiuid:master", role: role.MASTER },
-  { uid: "testuid:watcher", role: role.WATCHER },
+const createTestUser = (uid: string, role: RoleType): User => {
+  return {
+    isSignedIn: false,
+    uid: uid,
+    username: "name:" + uid,
+    role: role,
+    email: uid + "@mail.com",
+    isDeleted: false,
+  };
+};
+
+const deletedUser = {
+  ...createTestUser("testuid:deleted", role.WATCHER),
+  isDeleted: true,
+};
+
+const users: User[] = [
+  createTestUser("testuid:editor", role.EDITOR),
+  createTestUser("tesiuid:master", role.MASTER),
+  createTestUser("testuid:watcher", role.WATCHER),
+  deletedUser,
 ];
 
 export const mockData = {
@@ -53,8 +70,9 @@ export const mockData = {
   album: mockAlbums[0],
   users: users,
   user: {
-    editor: users.find((user) => user.role === role.EDITOR),
-    master: users.find((user) => user.role === role.MASTER),
-    watcher: users.find((user) => user.role === role.WATCHER),
+    editor: users[0],
+    master: users[1],
+    watcher: users[2],
+    deletedUser: users[3],
   },
 };
