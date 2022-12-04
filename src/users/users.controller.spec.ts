@@ -90,19 +90,19 @@ describe("UsersController", () => {
   });
 
   describe("deleteUser", () => {
-    it("IDと一致するユーザーが存在しない場合、エラーを発生させる", async () => {
+    it("IDと一致するユーザーが存在しない場合、403エラーを発生させる", async () => {
       await expect(usersController.deleteUser("999")).rejects.toThrow(
         /指定されたユーザーは存在しません。/
       );
     });
 
-    it("IDと一致するユーザーが既に削除済(論理削除)の場合、削除を行わずにエラーを発生させる", async () => {
+    it("IDと一致するユーザーが既に削除済(論理削除)の場合、削除を行わずに400エラーを発生させる", async () => {
       await expect(
         usersController.deleteUser("testuid:deleted")
       ).rejects.toThrow();
     });
 
-    it("IDと一致するユーザーが管理ユーザー(master)である場合、削除を行わずにエラーを発生させる", async () => {
+    it("IDと一致するユーザーが管理ユーザー(master)である場合、削除を行わずに400エラーを発生させる", async () => {
       await expect(
         usersController.deleteUser("testuid:master")
       ).rejects.toThrow();

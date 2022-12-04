@@ -1,13 +1,16 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Delete,
   Get,
   NotFoundException,
   Param,
+  Post,
 } from "@nestjs/common";
 import { User } from "ufo-society1974-definition-types";
 import { role } from "../constants";
+import { CreateUserDTO } from "./users.dto";
 import { UsersService } from "./users.service";
 
 export interface UsersResponse {
@@ -33,7 +36,7 @@ export class UsersController {
       throw new NotFoundException("指定されたユーザーは存在しません。");
     }
 
-    // 削除済みということなので404で良いだろう
+    // 削除済みということなので404でよさそう
     if (targetUser.isDeleted) {
       throw new NotFoundException("指定されたユーザーは存在しません。");
     }
@@ -41,7 +44,20 @@ export class UsersController {
     return { users: [targetUser] };
   }
 
-  // 論理削除だが利用者(フロントエンド)からしたら削除なのでHTTP DELETEメソッドで良いだろう
+  @Post()
+  async createUser(@Body() user: CreateUserDTO) {
+    const findByEmailResult = await this.usersService.findByEmail(user.email);
+
+    if (findByEmailResult) {
+      throw new BadRequestException(
+        "入力したメールアドレスは既に使われています。"
+      );
+    }
+
+    return this.usersService.create(user);
+  }
+
+  // 論理削除だが利用者(フロントエンド)からしたら削除なのでHTTP DELETEメソッドでよさそう
   @Delete(":userId")
   async deleteUser(@Param("userId") userId: string) {
     const targetUser = await this.usersService.findById(userId);

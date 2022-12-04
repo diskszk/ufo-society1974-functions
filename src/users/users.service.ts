@@ -4,6 +4,7 @@ import { USERS } from "../constants";
 import { userConverter } from "./firestoreConverter";
 import { User } from "ufo-society1974-definition-types";
 import { CreateUserDTO } from "./users.dto";
+import * as firebase from "firebase-admin";
 
 @Injectable()
 export class UsersService {
@@ -69,5 +70,14 @@ export class UsersService {
     return await this.usersRef.doc(id).withConverter(userConverter).update({
       isDeleted: true,
     });
+  }
+
+  async findByEmail(email: string) {
+    const auth = firebase.auth();
+    try {
+      return await auth.getUserByEmail(email);
+    } catch {
+      return null;
+    }
   }
 }
