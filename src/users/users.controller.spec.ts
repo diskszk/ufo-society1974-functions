@@ -58,10 +58,35 @@ describe("UsersController", () => {
     expect(usersController).toBeDefined();
   });
 
-  it("findAllUser", async () => {
-    const users = await usersController.findAllUser();
+  describe("findAllUser", () => {
+    it("未削除のユーザーを全件取得する", async () => {
+      const { users } = await usersController.findAllUser();
 
-    expect(users.users).toHaveLength(3);
+      expect(users).toHaveLength(3);
+      expect(users.filter(({ isDeleted }) => isDeleted)).toHaveLength(0);
+    });
+  });
+
+  describe("findUserById", () => {
+    it("IDと一致するユーザーが存在する場合、該当するユーザーを取得する", async () => {
+      const res = await usersController.findUserById("testuid:editor");
+      expect(res.users).toHaveLength(1);
+
+      const user = res.users[0];
+      expect(user.uid).toBe("testuid:editor");
+    });
+
+    it("IDと一致するユーザーが存在しない場合、404エラーを発生させる", async () => {
+      await expect(usersController.findUserById("999")).rejects.toThrow(
+        /指定されたユーザーは存在しません。/
+      );
+    });
+
+    it("IDと一致するユーザーが削除済みの場合、該当するユーザーを取得せず404エラーを発生させる", async () => {
+      await expect(
+        usersController.findUserById("testuid:deleted")
+      ).rejects.toThrow(/指定されたユーザーは存在しません。/);
+    });
   });
 
   describe("deleteUser", () => {

@@ -64,16 +64,9 @@ export class UsersService {
       .add({ ...user, createdAt: firestore.Timestamp.now() });
   }
 
-  // delete(isDeletedをfalseにする)
+  // Controllerで異常系をはじいて正常なデータしか処理しない
   async delete(id: string): Promise<firestore.WriteResult> {
-    const ref = this.usersRef.doc(id);
-
-    const document = await ref.get();
-    if (!document.exists) {
-      return Promise.reject(new Error("Not Found User"));
-    }
-
-    return await ref.withConverter(userConverter).update({
+    return await this.usersRef.doc(id).withConverter(userConverter).update({
       isDeleted: true,
     });
   }

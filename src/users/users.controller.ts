@@ -1,16 +1,16 @@
 import {
   BadRequestException,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
-  Post,
 } from "@nestjs/common";
 import { User } from "ufo-society1974-definition-types";
 import { role } from "../constants";
 import { UsersService } from "./users.service";
 
-export interface UserResponse {
+export interface UsersResponse {
   users: User[];
 }
 
@@ -19,13 +19,30 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  async findAllUser(): Promise<UserResponse> {
+  async findAllUser(): Promise<UsersResponse> {
     const users = await this.usersService.findAll();
 
-    return { users };
+    return { users: [...users] };
   }
 
-  @Post(":userId")
+  @Get(":userId")
+  async findUserById(@Param("userId") userId: string): Promise<UsersResponse> {
+    const targetUser = await this.usersService.findById(userId);
+
+    if (!targetUser) {
+      throw new NotFoundException("指定されたユーザーは存在しません。");
+    }
+
+    // 削除済みということなので404で良いだろう
+    if (targetUser.isDeleted) {
+      throw new NotFoundException("指定されたユーザーは存在しません。");
+    }
+
+    return { users: [targetUser] };
+  }
+
+  // 論理削除だが利用者(フロントエンド)からしたら削除なのでHTTP DELETEメソッドで良いだろう
+  @Delete(":userId")
   async deleteUser(@Param("userId") userId: string) {
     const targetUser = await this.usersService.findById(userId);
 

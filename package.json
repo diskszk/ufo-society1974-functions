@@ -16,6 +16,9 @@
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
     "test": "jest",
+    "test:o": "jest --onlyChanged",
+    "test:f": "jest --onlyFailures",
+    "test:cc": "jest --clearCache",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage"
   },
