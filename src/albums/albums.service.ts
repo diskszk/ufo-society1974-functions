@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { Album } from "ufo-society1974-definition-types";
-import { albumConverter } from "./firestoreConverter";
+import { albumConverter } from "./albums.converter";
 import { ALBUMS, PUBLISHED_ALBUMS, PUBLISHED_DATE } from "../constants";
 import { firestore } from "firebase-admin";
 import { CreateAlbumDTO } from "./albums.dto";

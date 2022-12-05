@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { firestore } from "firebase-admin";
 import { USERS } from "../constants";
-import { userConverter } from "./firestoreConverter";
+import { userConverter } from "./usrs.converter";
 import { User } from "ufo-society1974-definition-types";
 import { CreateUserDTO } from "./users.dto";
 import * as firebase from "firebase-admin";
