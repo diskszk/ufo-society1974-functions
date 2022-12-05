@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { firestore } from "firebase-admin";
 import { Song } from "ufo-society1974-definition-types";
 import { PUBLISHED_ALBUMS, SONGS } from "../constants";
-import { songConverter } from "./firestoreConverter";
+import { songConverter } from "./songs.converter";
 
 @Injectable()
 export class SongsService {
