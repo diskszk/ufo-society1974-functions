@@ -6,14 +6,14 @@ import {
   Param,
   Post,
   UseGuards,
-  UseInterceptors,
 } from "@nestjs/common";
 import { Album } from "ufo-society1974-definition-types";
 import { role } from "../constants";
 import { AuthGuard } from "../auth/auth.guard";
-import { UserRoleInterceptor } from "../interceptor/userRole.interceptor";
 import { CreateAlbumDTO } from "./albums.dto";
 import { AlbumsService } from "./albums.service";
+import { RoleGuard } from "../role/role.guard";
+import { Role } from "../decorators/role.decorator";
 
 @Controller("albums")
 export class AlbumsController {
@@ -36,7 +36,8 @@ export class AlbumsController {
 
   @Post()
   @UseGuards(AuthGuard)
-  @UseInterceptors(new UserRoleInterceptor(role.EDITOR))
+  @Role(role.EDITOR)
+  @UseGuards(RoleGuard)
   async createAlbum(
     @Body() album: CreateAlbumDTO
   ): Promise<FirebaseFirestore.DocumentReference<CreateAlbumDTO>> {

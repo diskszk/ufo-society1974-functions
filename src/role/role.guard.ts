@@ -7,6 +7,10 @@ import {
 import { Reflector } from "@nestjs/core";
 import { RoleType } from "../types";
 
+/*
+  headerからuserのroleを取得してバリデーションを行う
+  invalidの場合403エラーを発生させる
+ */
 @Injectable()
 export class RoleGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}

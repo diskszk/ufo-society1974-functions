@@ -8,14 +8,14 @@ import {
   Param,
   Post,
   UseGuards,
-  UseInterceptors,
 } from "@nestjs/common";
 import { User } from "ufo-society1974-definition-types";
 import { role } from "../constants";
 import { AuthGuard } from "../auth/auth.guard";
-import { UserRoleInterceptor } from "../interceptor/userRole.interceptor";
 import { CreateUserDTO } from "./users.dto";
 import { UsersService } from "./users.service";
+import { Role } from "../decorators/role.decorator";
+import { RoleGuard } from "../role/role.guard";
 
 export interface UsersResponse {
   users: User[];
@@ -50,7 +50,8 @@ export class UsersController {
   }
 
   @Post()
-  @UseInterceptors(new UserRoleInterceptor(role.MASTER))
+  @Role(role.MASTER)
+  @UseGuards(RoleGuard)
   async createUser(@Body() user: CreateUserDTO) {
     const findByEmailResult = await this.usersService.findByEmail(user.email);
 
@@ -63,9 +64,10 @@ export class UsersController {
     return this.usersService.create(user);
   }
 
-  // 論理削除だが利用者(フロントエンド)からしたら削除なのでHTTP DELETEメソッドでよさそう
+  // 論理削除だがクライアントからみたら削除なのでHTTP DELETEメソッドでよさそう
   @Delete(":userId")
-  @UseInterceptors(new UserRoleInterceptor(role.MASTER))
+  @Role(role.MASTER)
+  @UseGuards(RoleGuard)
   async deleteUser(@Param("userId") userId: string) {
     const targetUser = await this.usersService.findById(userId);
 
