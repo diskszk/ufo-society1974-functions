@@ -10,7 +10,7 @@ import {
 } from "@nestjs/common";
 import { Album } from "ufo-society1974-definition-types";
 import { role } from "../constants";
-import { AuthGuard } from "../guard/auth.guard";
+import { AuthGuard } from "../auth/auth.guard";
 import { UserRoleInterceptor } from "../interceptor/userRole.interceptor";
 import { CreateAlbumDTO } from "./albums.dto";
 import { AlbumsService } from "./albums.service";

@@ -7,7 +7,7 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { Observable } from "rxjs";
-import { AuthGuard } from "../guard/auth.guard";
+import { AuthGuard } from "../auth/auth.guard";
 import { RoleType } from "../types";
 
 /*

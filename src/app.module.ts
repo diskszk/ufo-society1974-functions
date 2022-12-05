@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { UsersModule } from "./users/users.module";
 import { AlbumsModule } from "./albums/albums.module";
-import { AuthModule } from "./guard/auth.module";
+import { AuthModule } from "./auth/auth.module";
 import { AppController } from "./app.controller";
 
 @Module({

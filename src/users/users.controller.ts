@@ -12,7 +12,7 @@ import {
 } from "@nestjs/common";
 import { User } from "ufo-society1974-definition-types";
 import { role } from "../constants";
-import { AuthGuard } from "../guard/auth.guard";
+import { AuthGuard } from "../auth/auth.guard";
 import { UserRoleInterceptor } from "../interceptor/userRole.interceptor";
 import { CreateUserDTO } from "./users.dto";
 import { UsersService } from "./users.service";

@@ -1,7 +1,7 @@
 import { Controller, Get, UseGuards } from "@nestjs/common";
 import { UserInfo } from "firebase-admin/auth";
 import { UserGuardDecorator } from "./decorators/UserGuardDecorator";
-import { AuthGuard } from "./guard/auth.guard";
+import { AuthGuard } from "./auth/auth.guard";
 import { UsersService } from "./users/users.service";
 
 @Controller("app")
