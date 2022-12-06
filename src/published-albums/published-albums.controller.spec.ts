@@ -1,8 +1,8 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { DummyAlbumsService } from "../albums/albums.controller.spec";
-import { CreateAlbumDTO } from "../albums/albums.dto";
-import { AlbumsModule } from "../albums/albums.module";
-import { AlbumsService } from "../albums/albums.service";
+import { DummyAlbumsService } from "../albums-util/dummy-albums.service";
+import { CreateAlbumDTO } from "../albums-util/albums.dto";
+import { DraftAlbumsModule } from "../draft-albums/draft-albums.module";
+import { DraftAlbumsService } from "../draft-albums/draft-albums.service";
 import { mockData } from "../mock";
 import { PublishedAlbumsController } from "./published-albums.controller";
 import { PublishedAlbumsModule } from "./published-albums.module";
@@ -28,22 +28,22 @@ class DummyPublishedAlbumService {
 describe("PublishedAlbumsController", () => {
   let controller: PublishedAlbumsController;
   let publishedAlbumsService: PublishedAlbumsService;
-  let draftedAlbumsService: AlbumsService;
+  let draftedAlbumsService: DraftAlbumsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [PublishedAlbumsModule, AlbumsModule],
+      imports: [PublishedAlbumsModule, DraftAlbumsModule],
     })
       .overrideProvider(PublishedAlbumsService)
       .useClass(DummyPublishedAlbumService)
-      .overrideProvider(AlbumsService)
+      .overrideProvider(DraftAlbumsService)
       .useClass(DummyAlbumsService)
       .compile();
 
     publishedAlbumsService = module.get<PublishedAlbumsService>(
       PublishedAlbumsService
     );
-    draftedAlbumsService = module.get<AlbumsService>(AlbumsService);
+    draftedAlbumsService = module.get<DraftAlbumsService>(DraftAlbumsService);
 
     controller = new PublishedAlbumsController(
       publishedAlbumsService,

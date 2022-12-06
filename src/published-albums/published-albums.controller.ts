@@ -7,7 +7,7 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { Album } from "ufo-society1974-definition-types";
-import { AlbumsService } from "../albums/albums.service";
+import { DraftAlbumsService } from "../draft-albums/draft-albums.service";
 import { AuthGuard } from "../auth/auth.guard";
 import { role } from "../constants";
 import { Role } from "../decorators/role.decorator";
@@ -22,7 +22,7 @@ interface PublishedAlbumsResponse {
 export class PublishedAlbumsController {
   constructor(
     private readonly publishedAlbumsService: PublishedAlbumsService,
-    private readonly draftAlbumService: AlbumsService
+    private readonly draftAlbumService: DraftAlbumsService
   ) {}
 
   @Get()

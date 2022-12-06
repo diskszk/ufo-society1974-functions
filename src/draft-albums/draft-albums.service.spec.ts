@@ -1,17 +1,17 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { mockData } from "../mock/";
-import { AlbumsService } from "./albums.service";
+import { mockData } from "../mock";
+import { DraftAlbumsService } from "./draft-albums.service";
 
 describe("AlbumsService", () => {
-  let albumsService: AlbumsService;
-  let fakeAlbumsService: Partial<AlbumsService>;
+  let albumsService: DraftAlbumsService;
+  let fakeAlbumsService: Partial<DraftAlbumsService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AlbumsService],
+      providers: [DraftAlbumsService],
     }).compile();
 
-    albumsService = module.get<AlbumsService>(AlbumsService);
+    albumsService = module.get<DraftAlbumsService>(DraftAlbumsService);
 
     fakeAlbumsService = {
       findAll: async () => {

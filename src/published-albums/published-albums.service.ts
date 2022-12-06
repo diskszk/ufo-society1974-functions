@@ -1,14 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { firestore } from "firebase-admin";
 import { Album } from "ufo-society1974-definition-types";
-import { albumConverter } from "../albums/albums.converter";
-import { CreateAlbumDTO } from "../albums/albums.dto";
+import { albumConverter } from "../albums-util/albums.converter";
+import { CreateAlbumDTO } from "../albums-util/albums.dto";
 import { PUBLISHED_ALBUMS, PUBLISHED_DATE } from "../constants";
 
 @Injectable()
 export class PublishedAlbumsService {
   private readonly db: FirebaseFirestore.Firestore;
-  private readonly publishedAlbumRes: firestore.CollectionReference<firestore.DocumentData>;
+  private readonly publishedAlbumRef: firestore.CollectionReference<firestore.DocumentData>;
 
   constructor() {
     if (process.env.NODE_ENV === "test") {
@@ -16,11 +16,11 @@ export class PublishedAlbumsService {
     }
 
     this.db = firestore();
-    this.publishedAlbumRes = this.db.collection(PUBLISHED_ALBUMS);
+    this.publishedAlbumRef = this.db.collection(PUBLISHED_ALBUMS);
   }
 
   async findAll(): Promise<Album[]> {
-    const snapshots = (await this.publishedAlbumRes
+    const snapshots = (await this.publishedAlbumRef
       .orderBy(PUBLISHED_DATE, "desc")
       .withConverter(albumConverter)
       .get()) as firestore.QuerySnapshot<Album>;
@@ -33,7 +33,7 @@ export class PublishedAlbumsService {
   }
 
   async findById(id: string): Promise<Album | null> {
-    const snapshot = (await this.publishedAlbumRes
+    const snapshot = (await this.publishedAlbumRef
       .doc(id)
       .withConverter(albumConverter)
       .get()) as firestore.DocumentSnapshot<Album>;
@@ -50,7 +50,7 @@ export class PublishedAlbumsService {
   async create(
     album: CreateAlbumDTO
   ): Promise<firestore.DocumentReference<CreateAlbumDTO>> {
-    return await this.publishedAlbumRes
+    return await this.publishedAlbumRef
       .withConverter(albumConverter)
       .add({ ...album });
   }
