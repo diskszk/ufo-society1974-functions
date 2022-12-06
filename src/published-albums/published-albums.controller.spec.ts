@@ -57,8 +57,8 @@ describe("PublishedAlbumsController", () => {
 
   describe("findAlbums", () => {
     it("公開済みアルバムを全件取得する", async () => {
-      const { albums } = await controller.findAlbums();
-      expect(albums).toHaveLength(2);
+      const { publishedAlbums } = await controller.findAlbums();
+      expect(publishedAlbums).toHaveLength(2);
     });
   });
 
@@ -66,7 +66,7 @@ describe("PublishedAlbumsController", () => {
     it("IDと一致するアルバムが存在する場合、該当するアルバムを返す", async () => {
       const response = await controller.findOne("sample01");
 
-      const album = response.albums[0];
+      const album = response.publishedAlbums[0];
       expect(album.id).toBe("sample01");
     });
 

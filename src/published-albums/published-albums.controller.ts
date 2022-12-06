@@ -4,13 +4,18 @@ import {
   NotFoundException,
   Param,
   Post,
+  UseGuards,
 } from "@nestjs/common";
 import { Album } from "ufo-society1974-definition-types";
 import { AlbumsService } from "../albums/albums.service";
+import { AuthGuard } from "../auth/auth.guard";
+import { role } from "../constants";
+import { Role } from "../decorators/role.decorator";
+import { RoleGuard } from "../role/role.guard";
 import { PublishedAlbumsService } from "./published-albums.service";
 
-interface Response {
-  albums: Album[];
+interface PublishedAlbumsResponse {
+  publishedAlbums: Album[];
 }
 
 @Controller("published-albums")
@@ -21,26 +26,29 @@ export class PublishedAlbumsController {
   ) {}
 
   @Get()
-  async findAlbums(): Promise<Response> {
+  async findAlbums(): Promise<PublishedAlbumsResponse> {
     const albums = await this.publishedAlbumsService.findAll();
 
-    return { albums };
+    return { publishedAlbums: albums };
   }
 
   @Get(":albumId")
-  async findOne(@Param("albumId") albumId: string): Promise<Response> {
+  async findOne(
+    @Param("albumId") albumId: string
+  ): Promise<PublishedAlbumsResponse> {
     const album = await this.publishedAlbumsService.findById(albumId);
 
     if (!album) {
       throw new NotFoundException("IDと一致するアルバムは存在しません。");
     }
 
-    return { albums: [album] };
+    return { publishedAlbums: [album] };
   }
 
-  // editorのみ
-  // albums/:idのリソースsongsを含めてコピーする
   @Post(":originAlbumId")
+  @UseGuards(AuthGuard)
+  @Role(role.EDITOR)
+  @UseGuards(RoleGuard)
   async publishAlbum(@Param("originAlbumId") originAlbumId: string) {
     // idをもとに元データを取得する
     const originAlbum = await this.draftAlbumService.findById(originAlbumId);
@@ -49,7 +57,7 @@ export class PublishedAlbumsController {
       throw new NotFoundException("IDと一致するアルバムは存在しません。");
     }
 
-    // 取得したデータで新しくidも作成する
+    // 取得したデータで新しくidを生成する為削除する
     delete originAlbum.id;
 
     return this.publishedAlbumsService.create({ ...originAlbum });
