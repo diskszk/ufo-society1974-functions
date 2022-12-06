@@ -8,5 +8,6 @@ import { AlbumsService } from "./albums.service";
   imports: [AuthModule, RoleModule],
   controllers: [AlbumsController],
   providers: [AlbumsService],
+  exports: [AlbumsService],
 })
 export class AlbumsModule {}

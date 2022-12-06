@@ -5,7 +5,7 @@ import { CreateAlbumDTO } from "./albums.dto";
 import { AlbumsModule } from "./albums.module";
 import { AlbumsService } from "./albums.service";
 
-class DummyAlbumsService {
+export class DummyAlbumsService {
   async findAll() {
     return [...mockData.albums];
   }
