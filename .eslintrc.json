@@ -38,6 +38,7 @@
     "@typescript-eslint/no-explicit-any": "off",
     "eslint-disable-next-line": "off",
     "new-cap": "off",
-    "no-console": "warn"
+    "no-console": "warn",
+    "max-len": "off"
   }
 }

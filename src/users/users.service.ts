@@ -9,7 +9,6 @@ import * as firebase from "firebase-admin";
 @Injectable()
 export class UsersService {
   private readonly db: firestore.Firestore;
-  // eslint-disable-next-line max-len
   private readonly usersRef: firestore.CollectionReference<firestore.DocumentData>;
 
   constructor() {

@@ -18,6 +18,7 @@ export const albumConverter: FirestoreDataConverter<Album | CreateAlbumDTO> = {
       publishedDate: data.publishedDate,
       imageFile: data.imageFile,
       title: data.title,
+      createdAt: data.createdAt,
     };
   },
 };
