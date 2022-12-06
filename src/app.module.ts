@@ -4,9 +4,16 @@ import { AlbumsModule } from "./albums/albums.module";
 import { AuthModule } from "./auth/auth.module";
 import { AppController } from "./app.controller";
 import { RoleModule } from "./role/role.module";
+import { PublishedAlbumsModule } from "./published-albums/published-albums.module";
 
 @Module({
-  imports: [AlbumsModule, AuthModule, UsersModule, RoleModule],
+  imports: [
+    AlbumsModule,
+    AuthModule,
+    UsersModule,
+    RoleModule,
+    PublishedAlbumsModule,
+  ],
   controllers: [AppController],
   providers: [],
 })
