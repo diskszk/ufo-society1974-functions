@@ -1,5 +1,5 @@
 import {
-  HttpException,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from "@nestjs/common";
@@ -9,7 +9,7 @@ import * as admin from "firebase-admin";
 export class AuthService {
   async validateUser(idToken: string) {
     if (!idToken) {
-      throw new UnauthorizedException("認証されていません");
+      throw new UnauthorizedException("認証されていません。");
     }
 
     try {
@@ -17,7 +17,7 @@ export class AuthService {
 
       return user;
     } catch {
-      throw new HttpException("Forbidden", 401);
+      throw new ForbiddenException("認可されていません。");
     }
   }
 }

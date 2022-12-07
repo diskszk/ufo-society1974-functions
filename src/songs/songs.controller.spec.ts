@@ -30,16 +30,10 @@ describe("SongsController", () => {
     expect(songsController).toBeDefined();
   });
 
-  describe("/albums/:albumId/songs", () => {
+  describe("findSongsByAlbumId", () => {
     it("アルバムIDと一致するアルバムが存在する場合、該当するアルバムの曲一覧を返す", async () => {
-      const songs = await songsController.findSongsByAlbumId("testid");
+      const { songs } = await songsController.findSongsByAlbumId("testid");
       expect(songs).toHaveLength(2);
-    });
-
-    it("アルバムIDと一致するアルバムがない場合、エラーが発生すること", async () => {
-      await expect(songsController.findSongsByAlbumId("999")).rejects.toThrow(
-        /Missing Album Id/
-      );
     });
   });
 });

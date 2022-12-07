@@ -2,7 +2,7 @@ import {
   Body,
   Controller,
   Get,
-  HttpException,
+  NotFoundException,
   Param,
   Post,
   UseGuards,
@@ -36,7 +36,7 @@ export class DraftAlbumsController {
   ): Promise<DraftAlbumsResponse> {
     const album = await this.albumsService.findById(albumId);
     if (!album) {
-      throw new HttpException("Missing Album Id", 404);
+      throw new NotFoundException("IDと一致するアルバムは存在しません。");
     }
 
     return { draftAlbums: [album] };
