@@ -1,11 +1,13 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { mockData } from "../mock";
+import { SongTitleAndStory } from "../types";
 import { SongsController } from "./songs.controller";
 import { SongsService } from "./songs.service";
 
 class DummySongsService {
-  async findAll(id: string) {
-    return id === "testid" ? [...mockData.songs] : null;
+  async findAllSongTitleAndStories(albumId: string) {
+    const data: SongTitleAndStory[] = [...mockData.songs];
+    return albumId === "testid" ? [...data] : null;
   }
 }
 
@@ -28,12 +30,5 @@ describe("SongsController", () => {
 
   it("should be defined", () => {
     expect(songsController).toBeDefined();
-  });
-
-  describe("findSongsByAlbumId", () => {
-    it("アルバムIDと一致するアルバムが存在する場合、該当するアルバムの曲一覧を返す", async () => {
-      const { songs } = await songsController.findSongsByAlbumId("testid");
-      expect(songs).toHaveLength(2);
-    });
   });
 });

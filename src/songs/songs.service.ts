@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { firestore } from "firebase-admin";
-import { Song } from "ufo-society1974-definition-types";
-import { PUBLISHED_ALBUMS, SONGS } from "../constants";
+import { DRAFT_ALBUMS, PUBLISHED_ALBUMS, SONGS } from "../constants";
+import { SongTitleAndStory } from "../types";
 import { songConverter } from "./songs.converter";
 
 @Injectable()
@@ -16,21 +16,26 @@ export class SongsService {
     }
   }
 
-  async findAll(albumId: string): Promise<Song[]> {
+  async findAllSongTitleAndStories(
+    targetRef: typeof DRAFT_ALBUMS | typeof PUBLISHED_ALBUMS,
+    albumId: string
+  ): Promise<SongTitleAndStory[]> {
     const songsRef = this.db
-      .collection(PUBLISHED_ALBUMS)
+      .collection(targetRef)
       .doc(albumId)
       .collection(SONGS)
       .orderBy("id")
       .withConverter(songConverter);
 
     const snapshots = await songsRef.get();
-    const songs: Song[] = snapshots.docs.map((snapshot) => {
-      const doc = snapshot.data();
+    const songTitlesAndStories: SongTitleAndStory[] = snapshots.docs.map(
+      (snapshot) => {
+        const doc = snapshot.data();
 
-      return { ...doc, id: snapshot.id };
-    });
+        return { ...doc };
+      }
+    );
 
-    return songs;
+    return songTitlesAndStories;
   }
 }

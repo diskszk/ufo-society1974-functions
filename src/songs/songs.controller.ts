@@ -1,9 +1,10 @@
 import { Controller, Get, Param } from "@nestjs/common";
-import { Song } from "ufo-society1974-definition-types";
+import { PUBLISHED_ALBUMS } from "../constants";
+import { SongTitleAndStory } from "../types";
 import { SongsService } from "./songs.service";
 
 interface SongsResponse {
-  songs: Song[];
+  songTitlesAndStories: SongTitleAndStory[];
 }
 
 @Controller()
@@ -14,8 +15,11 @@ export class SongsController {
   async findSongsByAlbumId(
     @Param("albumId") albumId: string
   ): Promise<SongsResponse> {
-    const songs = await this.songsService.findAll(albumId);
+    const songs = await this.songsService.findAllSongTitleAndStories(
+      PUBLISHED_ALBUMS,
+      albumId
+    );
 
-    return { songs: [...songs] };
+    return { songTitlesAndStories: songs };
   }
 }
