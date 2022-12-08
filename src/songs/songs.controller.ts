@@ -1,25 +1,25 @@
-import {
-  Controller,
-  Get,
-  HttpException,
-  HttpStatus,
-  Param,
-} from "@nestjs/common";
-import { Song } from "ufo-society1974-definition-types";
+import { Controller, Get, Param } from "@nestjs/common";
+import { PUBLISHED_ALBUMS } from "../constants";
+import { SongTitleAndStory } from "../types";
 import { SongsService } from "./songs.service";
+
+interface SongsResponse {
+  songTitlesAndStories: SongTitleAndStory[];
+}
 
 @Controller()
 export class SongsController {
   constructor(private readonly songsService: SongsService) {}
 
   @Get("albums/:albumId/songs")
-  async findSongsByAlbumId(@Param("albumId") albumId: string): Promise<Song[]> {
-    const songs = await this.songsService.findAll(albumId);
+  async findSongsByAlbumId(
+    @Param("albumId") albumId: string
+  ): Promise<SongsResponse> {
+    const songs = await this.songsService.findAllSongTitleAndStories(
+      PUBLISHED_ALBUMS,
+      albumId
+    );
 
-    if (!songs) {
-      throw new HttpException("Missing Album Id", HttpStatus.NOT_FOUND);
-    }
-
-    return songs;
+    return { songTitlesAndStories: songs };
   }
 }
