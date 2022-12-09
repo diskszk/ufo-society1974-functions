@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { firestore } from "firebase-admin";
-import { DRAFT_ALBUMS, PUBLISHED_ALBUMS, SONGS } from "../constants";
+import { ALBUMS, SONGS } from "../constants";
 import { SongTitleAndStory } from "../types";
 import { songConverter } from "./songs.converter";
 
@@ -17,11 +17,10 @@ export class SongsService {
   }
 
   async findAllSongTitleAndStories(
-    targetRef: typeof DRAFT_ALBUMS | typeof PUBLISHED_ALBUMS,
     albumId: string
   ): Promise<SongTitleAndStory[]> {
     const songsRef = this.db
-      .collection(targetRef)
+      .collection(ALBUMS)
       .doc(albumId)
       .collection(SONGS)
       .orderBy("id")

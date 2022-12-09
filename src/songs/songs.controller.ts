@@ -1,5 +1,4 @@
 import { Controller, Get, Param } from "@nestjs/common";
-import { PUBLISHED_ALBUMS } from "../constants";
 import { SongTitleAndStory } from "../types";
 import { SongsService } from "./songs.service";
 
@@ -15,10 +14,7 @@ export class SongsController {
   async findSongsByAlbumId(
     @Param("albumId") albumId: string
   ): Promise<SongsResponse> {
-    const songs = await this.songsService.findAllSongTitleAndStories(
-      PUBLISHED_ALBUMS,
-      albumId
-    );
+    const songs = await this.songsService.findAllSongTitleAndStories(albumId);
 
     return { songTitlesAndStories: songs };
   }

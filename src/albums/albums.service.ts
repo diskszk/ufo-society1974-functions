@@ -1,14 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { firestore } from "firebase-admin";
 import { Album } from "ufo-society1974-definition-types";
-import { albumConverter } from "../albums-util/albums.converter";
-import { CreateAlbumDTO } from "../albums-util/albums.dto";
-import { PUBLISHED_ALBUMS, PUBLISHED_DATE } from "../constants";
+import { albumConverter } from "./albums.converter";
+import { CreateAlbumDTO } from "./albums.dto";
+import { ALBUMS, PUBLISHED_DATE } from "../constants";
 
 @Injectable()
-export class PublishedAlbumsService {
+export class AlbumsService {
   private readonly db: FirebaseFirestore.Firestore;
-  private readonly publishedAlbumRef: firestore.CollectionReference<firestore.DocumentData>;
+  private readonly albumsRef: firestore.CollectionReference<firestore.DocumentData>;
 
   constructor() {
     if (process.env.NODE_ENV === "test") {
@@ -16,11 +16,11 @@ export class PublishedAlbumsService {
     }
 
     this.db = firestore();
-    this.publishedAlbumRef = this.db.collection(PUBLISHED_ALBUMS);
+    this.albumsRef = this.db.collection(ALBUMS);
   }
 
   async findAll(): Promise<Album[]> {
-    const snapshots = (await this.publishedAlbumRef
+    const snapshots = (await this.albumsRef
       .orderBy(PUBLISHED_DATE, "desc")
       .withConverter(albumConverter)
       .get()) as firestore.QuerySnapshot<Album>;
@@ -33,7 +33,7 @@ export class PublishedAlbumsService {
   }
 
   async findById(id: string): Promise<Album | null> {
-    const snapshot = (await this.publishedAlbumRef
+    const snapshot = (await this.albumsRef
       .doc(id)
       .withConverter(albumConverter)
       .get()) as firestore.DocumentSnapshot<Album>;
@@ -50,8 +50,6 @@ export class PublishedAlbumsService {
   async create(
     album: CreateAlbumDTO
   ): Promise<firestore.DocumentReference<CreateAlbumDTO>> {
-    return await this.publishedAlbumRef
-      .withConverter(albumConverter)
-      .add({ ...album });
+    return await this.albumsRef.withConverter(albumConverter).add({ ...album });
   }
 }
