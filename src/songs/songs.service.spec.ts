@@ -1,5 +1,4 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { DRAFT_ALBUMS, PUBLISHED_ALBUMS } from "../constants";
 import { mockData } from "../mock";
 import { SongTitleAndStory } from "../types";
 import { SongsService } from "./songs.service";
@@ -16,10 +15,7 @@ describe("SongsService", () => {
     songsService = module.get<SongsService>(SongsService);
 
     fakeSongsService = {
-      findAllSongTitleAndStories: async (
-        targetRef: typeof DRAFT_ALBUMS | typeof PUBLISHED_ALBUMS,
-        albumId: string
-      ) => {
+      findAllSongTitleAndStories: async (albumId: string) => {
         const data: SongTitleAndStory[] = [...mockData.songs];
         return albumId === "testid" ? [...data] : null;
       },
@@ -32,19 +28,13 @@ describe("SongsService", () => {
 
   describe("findAll", () => {
     it("IDと一致するアルバムが存在する場合、該当するアルバムの曲一覧を返す", async () => {
-      const songs = await fakeSongsService.findAllSongTitleAndStories(
-        PUBLISHED_ALBUMS,
-        "testid"
-      );
+      const songs = await fakeSongsService.findAllSongTitleAndStories("testid");
 
       expect(songs).toHaveLength(2);
     });
 
     it("IDと一致するアルバムが存在しない場合、nullを返す", async () => {
-      const response = await fakeSongsService.findAllSongTitleAndStories(
-        PUBLISHED_ALBUMS,
-        "999"
-      );
+      const response = await fakeSongsService.findAllSongTitleAndStories("999");
       expect(response).toBeNull();
     });
   });
