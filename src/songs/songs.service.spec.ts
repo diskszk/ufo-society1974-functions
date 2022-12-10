@@ -1,6 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { mockData } from "../mock";
-import { SongTitleAndStory } from "../types";
+import { SongSummary } from "../types";
 import { SongsService } from "./songs.service";
 
 describe("SongsService", () => {
@@ -15,9 +15,16 @@ describe("SongsService", () => {
     songsService = module.get<SongsService>(SongsService);
 
     fakeSongsService = {
-      findAllSongTitleAndStories: async (albumId: string) => {
-        const data: SongTitleAndStory[] = [...mockData.songs];
-        return albumId === "testid" ? [...data] : null;
+      findAllSongSummariesByAlbumId: async (albumId: string) => {
+        const songSummaries: SongSummary[] = [...mockData.songs];
+        return songSummaries;
+      },
+      findSongById: async (albumId: string, songId: string) => {
+        if (albumId === "testid" && songId === "001") {
+          return mockData.song;
+        } else {
+          return null;
+        }
       },
     };
   });
@@ -26,16 +33,25 @@ describe("SongsService", () => {
     expect(songsService).toBeDefined();
   });
 
-  describe("findAll", () => {
-    it("IDと一致するアルバムが存在する場合、該当するアルバムの曲一覧を返す", async () => {
-      const songs = await fakeSongsService.findAllSongTitleAndStories("testid");
+  describe("findAllSongSummariesByAlbumId", () => {
+    it("IDと一致するアルバムが存在すると仮定し、該当するアルバムの曲一覧を返す", async () => {
+      const songSummaries =
+        await fakeSongsService.findAllSongSummariesByAlbumId("testid");
 
-      expect(songs).toHaveLength(2);
+      expect(songSummaries).toHaveLength(2);
     });
+  });
 
-    it("IDと一致するアルバムが存在しない場合、nullを返す", async () => {
-      const response = await fakeSongsService.findAllSongTitleAndStories("999");
-      expect(response).toBeNull();
+  describe("findSongById", () => {
+    it("IDと一致するアルバムが存在すると仮定し、該当するアルバムからIDと一致する楽曲が存在する場合、該当する楽曲を返す", async () => {
+      const song = await fakeSongsService.findSongById("testid", "001");
+
+      expect(song.id).toBe("001");
+    });
+    it("IDと一致するアルバムが存在すると仮定し、該当するアルバムからIDと一致する楽曲が存在しない場合、nullを返す", async () => {
+      const song = await fakeSongsService.findSongById("testid", "999");
+
+      expect(song).toBeNull();
     });
   });
 });

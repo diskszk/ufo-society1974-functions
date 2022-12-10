@@ -33,16 +33,16 @@ export class AlbumsService {
   }
 
   async findById(id: string): Promise<Album | null> {
-    const snapshot = (await this.albumsRef
+    const snapshot = await this.albumsRef
       .doc(id)
       .withConverter(albumConverter)
-      .get()) as firestore.DocumentSnapshot<Album>;
+      .get();
 
     if (!snapshot.exists) {
       return null;
     }
 
-    const doc = snapshot.data();
+    const doc = snapshot.data() as Album;
     return { ...doc };
   }
 
