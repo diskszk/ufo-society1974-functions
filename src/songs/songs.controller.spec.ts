@@ -5,7 +5,7 @@ import { SongsController } from "./songs.controller";
 import { SongsService } from "./songs.service";
 
 class DummySongsService {
-  async findAllSongTitleAndStories(albumId: string) {
+  async findSongSummariesByAlbumId(albumId: string) {
     const data: SongSummary[] = [...mockData.songs];
     return albumId === "testid" ? [...data] : null;
   }

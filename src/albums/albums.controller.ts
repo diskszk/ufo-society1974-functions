@@ -1,20 +1,19 @@
-import { Controller, Get, NotFoundException, Param } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+} from "@nestjs/common";
 import { Album } from "ufo-society1974-definition-types";
-import { SongsService } from "../songs/songs.service";
-import { SongSummary } from "../types";
 import { AlbumsService } from "./albums.service";
 
 interface AlbumsResponse {
   albums: Album[];
-  songSummaries?: SongSummary[];
 }
 
 @Controller("albums")
 export class AlbumsController {
-  constructor(
-    private readonly albumsService: AlbumsService,
-    private readonly songsService: SongsService
-  ) {}
+  constructor(private readonly albumsService: AlbumsService) {}
 
   @Get()
   async findAlbums(): Promise<AlbumsResponse> {
@@ -31,10 +30,6 @@ export class AlbumsController {
       throw new NotFoundException("IDと一致するアルバムは存在しません。");
     }
 
-    const songSummaries = await this.songsService.findAllSongSummariesByAlbumId(
-      albumId
-    );
-
-    return { albums: [album], songSummaries };
+    return { albums: [album] };
   }
 }
