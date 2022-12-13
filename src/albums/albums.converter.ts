@@ -10,7 +10,7 @@ export const albumConverter = {
       publishedDate: album.publishedDate,
       title: album.title,
       published: false, // 新規作成時は非公開
-      createdAt: album.createdAt,
+      createdAt: FirebaseFirestore.Timestamp.now(),
     };
   },
   fromFirestore(
