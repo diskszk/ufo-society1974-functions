@@ -40,6 +40,14 @@ const mockAlbums: Album[] = [
     title: "test title 2",
     published: false,
   },
+  {
+    id: "sample03",
+    description: "test description3",
+    imageFile: null,
+    publishedDate: "20200101",
+    title: "test title 3",
+    published: false,
+  },
 ];
 
 const createTestUser = (uid: string, role: RoleType): User => {

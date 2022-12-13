@@ -30,7 +30,7 @@ describe("AlbumsService", () => {
   describe("findAll", () => {
     it("アルバム一覧を取得する", async () => {
       const albums = await fakeService.findAll();
-      expect(albums).toHaveLength(2);
+      expect(albums).toHaveLength(3);
     });
   });
 

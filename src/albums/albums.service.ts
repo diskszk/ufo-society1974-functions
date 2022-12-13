@@ -20,10 +20,10 @@ export class AlbumsService {
   }
 
   async findAll(): Promise<Album[]> {
-    const snapshots = (await this.albumsRef
+    const snapshots = await this.albumsRef
+      .withConverter<Album>(albumConverter)
       .orderBy(PUBLISHED_DATE, "desc")
-      .withConverter(albumConverter)
-      .get()) as firestore.QuerySnapshot<Album>;
+      .get();
 
     return snapshots.docs.map((snapshot) => {
       const doc = snapshot.data();
@@ -49,7 +49,9 @@ export class AlbumsService {
   async create(
     album: CreateAlbumDTO
   ): Promise<firestore.DocumentReference<CreateAlbumDTO>> {
-    return await this.albumsRef.withConverter(albumConverter).add({ ...album });
+    return await this.albumsRef
+      .withConverter<CreateAlbumDTO>(albumConverter)
+      .add({ ...album });
   }
 
   async setPublish(albumId: string): Promise<firestore.WriteResult> {
@@ -64,5 +66,12 @@ export class AlbumsService {
       .doc(albumId)
       .withConverter(albumConverter)
       .update({ published: false });
+  }
+
+  async delete(albumId: string): Promise<firestore.WriteResult> {
+    return await this.albumsRef
+      .doc(albumId)
+      .withConverter(albumConverter)
+      .delete();
   }
 }
