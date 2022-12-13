@@ -1,12 +1,12 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { mockData } from "../mock";
-import { SongTitleAndStory } from "../types";
+import { SongSummary } from "../types";
 import { SongsController } from "./songs.controller";
 import { SongsService } from "./songs.service";
 
 class DummySongsService {
   async findAllSongTitleAndStories(albumId: string) {
-    const data: SongTitleAndStory[] = [...mockData.songs];
+    const data: SongSummary[] = [...mockData.songs];
     return albumId === "testid" ? [...data] : null;
   }
 }

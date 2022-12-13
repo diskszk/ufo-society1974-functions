@@ -20,10 +20,10 @@ export class AlbumsService {
   }
 
   async findAll(): Promise<Album[]> {
-    const snapshots = (await this.albumsRef
+    const snapshots = await this.albumsRef
+      .withConverter<Album>(albumConverter)
       .orderBy(PUBLISHED_DATE, "desc")
-      .withConverter(albumConverter)
-      .get()) as firestore.QuerySnapshot<Album>;
+      .get();
 
     return snapshots.docs.map((snapshot) => {
       const doc = snapshot.data();
@@ -33,23 +33,45 @@ export class AlbumsService {
   }
 
   async findById(id: string): Promise<Album | null> {
-    const snapshot = (await this.albumsRef
+    const snapshot = await this.albumsRef
       .doc(id)
       .withConverter(albumConverter)
-      .get()) as firestore.DocumentSnapshot<Album>;
+      .get();
 
     if (!snapshot.exists) {
       return null;
     }
 
-    const doc = snapshot.data();
+    const doc = snapshot.data() as Album;
     return { ...doc };
   }
 
-  // albums/:idのリソースsongsを含めてコピーする
   async create(
     album: CreateAlbumDTO
   ): Promise<firestore.DocumentReference<CreateAlbumDTO>> {
-    return await this.albumsRef.withConverter(albumConverter).add({ ...album });
+    return await this.albumsRef
+      .withConverter<CreateAlbumDTO>(albumConverter)
+      .add({ ...album });
+  }
+
+  async setPublish(albumId: string): Promise<firestore.WriteResult> {
+    return await this.albumsRef
+      .doc(albumId)
+      .withConverter(albumConverter)
+      .update({ published: true });
+  }
+
+  async setUnpublish(albumId: string): Promise<firestore.WriteResult> {
+    return await this.albumsRef
+      .doc(albumId)
+      .withConverter(albumConverter)
+      .update({ published: false });
+  }
+
+  async delete(albumId: string): Promise<firestore.WriteResult> {
+    return await this.albumsRef
+      .doc(albumId)
+      .withConverter(albumConverter)
+      .delete();
   }
 }

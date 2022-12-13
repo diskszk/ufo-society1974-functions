@@ -1,21 +1,23 @@
 import { Controller, Get, Param } from "@nestjs/common";
-import { SongTitleAndStory } from "../types";
+import { SongSummary } from "../types";
 import { SongsService } from "./songs.service";
 
 interface SongsResponse {
-  songTitlesAndStories: SongTitleAndStory[];
+  songSummaries: SongSummary[];
 }
 
-@Controller()
+@Controller("albums/:albumId/songs")
 export class SongsController {
   constructor(private readonly songsService: SongsService) {}
 
-  @Get("albums/:albumId/songs")
+  @Get()
   async findSongsByAlbumId(
     @Param("albumId") albumId: string
   ): Promise<SongsResponse> {
-    const songs = await this.songsService.findAllSongTitleAndStories(albumId);
+    const songs = await this.songsService.findAllSongSummariesByAlbumId(
+      albumId
+    );
 
-    return { songTitlesAndStories: songs };
+    return { songSummaries: songs };
   }
 }

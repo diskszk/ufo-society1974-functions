@@ -30,6 +30,7 @@ const mockAlbums: Album[] = [
     imageFile: null,
     publishedDate: "20200101",
     title: "test title 1",
+    published: true,
   },
   {
     id: "sample02",
@@ -37,6 +38,15 @@ const mockAlbums: Album[] = [
     imageFile: null,
     publishedDate: "20200101",
     title: "test title 2",
+    published: false,
+  },
+  {
+    id: "sample03",
+    description: "test description3",
+    imageFile: null,
+    publishedDate: "20200101",
+    title: "test title 3",
+    published: false,
   },
 ];
 

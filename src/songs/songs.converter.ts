@@ -1,11 +1,21 @@
-import { FirestoreDataConverter } from "firebase-admin/firestore";
+import { DocumentData, FirestoreDataConverter } from "firebase-admin/firestore";
 import { Song } from "ufo-society1974-definition-types";
+import { CreateSongDTO } from "./songs.dto";
 
-export const songConverter: FirestoreDataConverter<Song> = {
-  toFirestore(_song: Song) {
-    return {};
+export const songConverter: FirestoreDataConverter<Song | CreateSongDTO> = {
+  toFirestore(song: Song): DocumentData {
+    return {
+      lyric: song.lyric,
+      story: song.story,
+      title: song.title,
+      wordsRights: song.wordsRights,
+      musicRights: song.musicRights,
+      songFile: song.songFile,
+    };
   },
-  fromFirestore(snapshot): Song {
+  fromFirestore(
+    snapshot: FirebaseFirestore.QueryDocumentSnapshot<DocumentData>
+  ): Song {
     const data = snapshot.data();
 
     return {

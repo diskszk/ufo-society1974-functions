@@ -20,7 +20,7 @@ const promiseApplicationReady = NestFactory.create(
   AppModule,
   new ExpressAdapter(server)
 ).then((app) => {
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   return app.init();
 });
 
