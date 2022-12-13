@@ -6,7 +6,10 @@ import { AlbumsService } from "./albums.service";
 
 interface AlbumsResponse {
   albums: Album[];
-  songSummaries?: SongSummary[];
+  info?: {
+    albumId: string;
+    songSummaries: SongSummary[];
+  };
 }
 
 @Controller("albums")
@@ -24,7 +27,9 @@ export class AlbumsController {
   }
 
   @Get(":albumId")
-  async findOne(@Param("albumId") albumId: string): Promise<AlbumsResponse> {
+  async findAlbumAndSummary(
+    @Param("albumId") albumId: string
+  ): Promise<AlbumsResponse> {
     const album = await this.albumsService.findById(albumId);
 
     if (!album) {
@@ -35,6 +40,6 @@ export class AlbumsController {
       albumId
     );
 
-    return { albums: [album], songSummaries };
+    return { albums: [album], info: { albumId, songSummaries } };
   }
 }

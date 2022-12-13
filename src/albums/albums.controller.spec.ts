@@ -57,7 +57,7 @@ describe("AlbumsController", () => {
   });
 
   describe("findAlbums", () => {
-    it("公開済みアルバムを全件取得する", async () => {
+    it("アルバムを全件取得する", async () => {
       const { albums } = await controller.findAlbums();
       expect(albums).toHaveLength(2);
     });
@@ -65,16 +65,16 @@ describe("AlbumsController", () => {
 
   describe("findOne", () => {
     it("IDと一致するアルバムが存在する場合、該当するアルバムを返す", async () => {
-      const response = await controller.findOne("sample01");
+      const response = await controller.findAlbumAndSummary("sample01");
 
       const album = response.albums[0];
-      const summaries = response.songSummaries;
+      const info = response.info;
       expect(album.id).toBe("sample01");
-      expect(summaries).toHaveLength(2);
+      expect(info.songSummaries).toHaveLength(2);
     });
 
     it("IDと一致するアルバムが存在しない場合、エラーを発生させること", async () => {
-      await expect(controller.findOne("test999")).rejects.toThrow(
+      await expect(controller.findAlbumAndSummary("test999")).rejects.toThrow(
         /IDと一致するアルバムは存在しません。/
       );
     });

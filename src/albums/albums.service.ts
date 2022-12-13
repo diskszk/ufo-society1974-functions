@@ -46,10 +46,23 @@ export class AlbumsService {
     return { ...doc };
   }
 
-  // albums/:idのリソースsongsを含めてコピーする
   async create(
     album: CreateAlbumDTO
   ): Promise<firestore.DocumentReference<CreateAlbumDTO>> {
     return await this.albumsRef.withConverter(albumConverter).add({ ...album });
+  }
+
+  async setPublish(albumId: string): Promise<firestore.WriteResult> {
+    return await this.albumsRef
+      .doc(albumId)
+      .withConverter(albumConverter)
+      .update({ published: true });
+  }
+
+  async setUnpublish(albumId: string): Promise<firestore.WriteResult> {
+    return await this.albumsRef
+      .doc(albumId)
+      .withConverter(albumConverter)
+      .update({ published: false });
   }
 }
