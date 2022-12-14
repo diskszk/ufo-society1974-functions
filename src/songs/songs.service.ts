@@ -20,6 +20,14 @@ export class SongsService {
     }
   }
 
+  async findIsAlbumExists(albumId: string): Promise<boolean> {
+    const snapshot = await this.albumsRef.doc(albumId).get();
+    if (snapshot.exists) {
+      return true;
+    }
+    return false;
+  }
+
   async findAllSongSummariesByAlbumId(albumId: string): Promise<SongSummary[]> {
     const songsRef = this.albumsRef.doc(albumId).collection(SONGS);
 
@@ -29,7 +37,7 @@ export class SongsService {
       .get();
 
     return snapshots.docs.map((snapshot) => {
-      const doc = snapshot.data() as Song;
+      const doc = snapshot.data();
 
       return {
         id: doc.id,
@@ -43,8 +51,8 @@ export class SongsService {
     const songRef = this.albumsRef.doc(albumId).collection(SONGS);
 
     return await songRef
-      .withConverter(songConverter)
-      .add({ ...songDTO, createdAt: firestore.Timestamp.now() });
+      .withConverter<CreateSongDTO>(songConverter)
+      .add({ ...songDTO });
   }
 
   async findSongById(albumId: string, songId: string): Promise<Song | null> {
@@ -56,7 +64,7 @@ export class SongsService {
       return null;
     }
 
-    const doc = snapshot.data() as Song;
+    const doc = snapshot.data();
 
     return { ...doc };
   }

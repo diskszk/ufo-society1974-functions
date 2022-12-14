@@ -1,15 +1,9 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { mockData } from "../mock";
-import { SongSummary } from "../types";
 import { SongsController } from "./songs.controller";
+import { SongsModule } from "./songs.module";
 import { SongsService } from "./songs.service";
 
-class DummySongsService {
-  async findAllSongTitleAndStories(albumId: string) {
-    const data: SongSummary[] = [...mockData.songs];
-    return albumId === "testid" ? [...data] : null;
-  }
-}
+class DummySongsService {}
 
 describe("SongsController", () => {
   let songsController: SongsController;
@@ -17,8 +11,7 @@ describe("SongsController", () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [SongsController],
-      providers: [SongsService],
+      imports: [SongsModule],
     })
       .overrideProvider(SongsService)
       .useClass(DummySongsService)
