@@ -20,6 +20,14 @@ export class SongsService {
     }
   }
 
+  async findIsAlbumExists(albumId: string): Promise<boolean> {
+    const snapshot = await this.albumsRef.doc(albumId).get();
+    if (snapshot.exists) {
+      return true;
+    }
+    return false;
+  }
+
   async findAllSongSummariesByAlbumId(albumId: string): Promise<SongSummary[]> {
     const songsRef = this.albumsRef.doc(albumId).collection(SONGS);
 
