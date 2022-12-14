@@ -1,5 +1,4 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { CreateAlbumDTO } from "./albums.dto";
 import { AlbumsModule } from "./albums.module";
 import { AlbumsService } from "./albums.service";
 import { mockData } from "../mock";
@@ -9,31 +8,13 @@ import { SongsModule } from "../songs/songs.module";
 import { SongsService } from "../songs/songs.service";
 
 export class DummyAlbumsService {
-  async findAll() {
-    return [...mockData.albums];
+  async findPublished() {
+    return mockData.albums.filter(({ published }) => published);
   }
 
   async findById(id: string) {
     const album = mockData.albums.find((album) => album.id === id) || null;
     return album;
-  }
-
-  async create(
-    albumDTO: CreateAlbumDTO
-  ): Promise<FirebaseFirestore.DocumentReference<CreateAlbumDTO>> {
-    return null;
-  }
-
-  async setPublish(albumId: string): Promise<FirebaseFirestore.WriteResult> {
-    return null;
-  }
-
-  async setUnpublish(albumId: string): Promise<FirebaseFirestore.WriteResult> {
-    return null;
-  }
-
-  async delete(albumId: string): Promise<FirebaseFirestore.WriteResult> {
-    return null;
   }
 }
 
@@ -69,10 +50,10 @@ describe("AlbumsController", () => {
     expect(albumsController).toBeDefined();
   });
 
-  describe("findPublishedAlbums", () => {
+  describe("findAllPublishedAlbums", () => {
     it("公開済みのアルバムを全件取得する", async () => {
-      const { albums } = await albumsController.findAlbums();
-      expect(albums).toHaveLength(3);
+      const { albums } = await albumsController.findAllPublishedAlbums();
+      expect(albums).toHaveLength(1);
     });
   });
 
@@ -91,33 +72,11 @@ describe("AlbumsController", () => {
         albumsController.findAlbumAndSummary("test999")
       ).rejects.toThrow(/IDと一致するアルバムは存在しません。/);
     });
-  });
 
-  describe("setPublish", () => {
-    it("IDと一致するアルバムが存在しない場合、エラーを発生させること", async () => {
+    it("IDと一致するアルバムが公開中でない場合、エラーを発生させること", async () => {
       await expect(
-        albumsController.setPublish("test999", false)
+        albumsController.findAlbumAndSummary("sample02")
       ).rejects.toThrow(/IDと一致するアルバムは存在しません。/);
-    });
-
-    it("IDと一致するアルバムが既に公開中かつ、queryにtrueが入力された場合、エラーを発生させること", async () => {
-      await expect(
-        albumsController.setPublish("sample01", true)
-      ).rejects.toThrow(/IDと一致するアルバムは既に公開中です。/);
-    });
-
-    it("IDと一致するアルバムが既に非公開中かつ、queryにfalseが入力された場合、エラーを発生させること", async () => {
-      await expect(
-        albumsController.setPublish("sample02", false)
-      ).rejects.toThrow(/IDと一致するアルバムは既に非公開です。/);
-    });
-  });
-
-  describe("delete", () => {
-    it("IDと一致するアルバムが存在しない場合、エラーを発生させること", async () => {
-      await expect(albumsController.deleteAlbum("test999")).rejects.toThrow(
-        /IDと一致するアルバムは存在しません。/
-      );
     });
   });
 });

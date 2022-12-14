@@ -14,7 +14,7 @@ describe("AlbumsService", () => {
     AlbumService = module.get<AlbumsService>(AlbumsService);
 
     fakeService = {
-      findAll: async () => {
+      findDrafted: async () => {
         return [...mockData.albums];
       },
       findById: async (id: string) => {
@@ -29,7 +29,7 @@ describe("AlbumsService", () => {
 
   describe("findAll", () => {
     it("アルバム一覧を取得する", async () => {
-      const albums = await fakeService.findAll();
+      const albums = await fakeService.findDrafted();
       expect(albums).toHaveLength(3);
     });
   });
