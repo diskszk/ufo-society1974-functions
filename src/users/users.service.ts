@@ -23,10 +23,7 @@ export class UsersService {
 
   async findAll(): Promise<User[]> {
     // 未削除のユーザーのみを取得する
-    const snapshots = await this.usersRef
-      .where("isDeleted", "==", false)
-      .withConverter(userConverter)
-      .get();
+    const snapshots = await this.usersRef.withConverter(userConverter).get();
 
     if (snapshots.empty) {
       return [];
@@ -35,7 +32,11 @@ export class UsersService {
     return snapshots.docs.map((snapshot) => {
       const doc = snapshot.data();
 
-      return { ...doc };
+      if (doc.isDeleted === false) {
+        return { ...doc };
+      }
+
+      return null;
     });
   }
 

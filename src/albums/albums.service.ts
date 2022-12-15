@@ -19,10 +19,9 @@ export class AlbumsService {
     this.albumsRef = this.db.collection(ALBUMS);
   }
 
-  async findDrafted(): Promise<Album[]> {
+  public async findAllAlbums(): Promise<Album[]> {
     const snapshots = await this.albumsRef
       .withConverter<Album>(albumConverter)
-      .where("published", "==", false)
       .orderBy(PUBLISHED_DATE, "desc")
       .get();
 
@@ -38,21 +37,17 @@ export class AlbumsService {
   }
 
   async findPublished(): Promise<Album[]> {
-    const snapshots = await this.albumsRef
-      .withConverter<Album>(albumConverter)
-      .where("published", "==", true)
-      .orderBy(PUBLISHED_DATE, "desc")
-      .get();
+    const allAlbums = await this.findAllAlbums();
 
-    if (snapshots.empty) {
-      return [];
-    }
+    // firestoreのwhere句でフィルタリングしようとすると500エラーになる為filterで回避する
+    return allAlbums.filter(({ published }) => published === true);
+  }
 
-    return snapshots.docs.map((snapshot) => {
-      const doc = snapshot.data();
+  async findDrafted(): Promise<Album[]> {
+    const allAlbums = await this.findAllAlbums();
 
-      return { ...doc };
-    });
+    // firestoreのwhere句でフィルタリングしようとすると500エラーになる為filterで回避する
+    return allAlbums.filter(({ published }) => published === false);
   }
 
   async findById(id: string): Promise<Album | null> {
