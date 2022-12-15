@@ -19,11 +19,34 @@ export class AlbumsService {
     this.albumsRef = this.db.collection(ALBUMS);
   }
 
-  async findAll(): Promise<Album[]> {
+  async findDrafted(): Promise<Album[]> {
     const snapshots = await this.albumsRef
       .withConverter<Album>(albumConverter)
+      .where("published", "==", false)
       .orderBy(PUBLISHED_DATE, "desc")
       .get();
+
+    if (snapshots.empty) {
+      return [];
+    }
+
+    return snapshots.docs.map((snapshot) => {
+      const doc = snapshot.data();
+
+      return { ...doc };
+    });
+  }
+
+  async findPublished(): Promise<Album[]> {
+    const snapshots = await this.albumsRef
+      .withConverter<Album>(albumConverter)
+      .where("published", "==", true)
+      .orderBy(PUBLISHED_DATE, "desc")
+      .get();
+
+    if (snapshots.empty) {
+      return [];
+    }
 
     return snapshots.docs.map((snapshot) => {
       const doc = snapshot.data();
@@ -42,7 +65,7 @@ export class AlbumsService {
       return null;
     }
 
-    const doc = snapshot.data() as Album;
+    const doc = snapshot.data();
     return { ...doc };
   }
 
