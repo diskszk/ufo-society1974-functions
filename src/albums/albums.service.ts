@@ -5,6 +5,7 @@ import { albumConverter } from "./albums.converter";
 import { CreateAlbumDTO } from "./albums.dto";
 import { ALBUMS, PUBLISHED_DATE } from "../constants";
 
+// get のみ実装する
 @Injectable()
 export class AlbumsService {
   private readonly db: FirebaseFirestore.Firestore;

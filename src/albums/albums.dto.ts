@@ -21,3 +21,26 @@ export class CreateAlbumDTO implements Omit<Album, "id" | "published"> {
     path: string;
   } | null;
 }
+
+export class UpdateAlbumDTO implements Omit<Album, "published"> {
+  @IsNotEmpty()
+  @IsString()
+  id: string;
+
+  @IsNotEmpty()
+  @IsString()
+  description: string;
+
+  @IsNotEmpty()
+  @IsString()
+  publishedDate: string;
+
+  @IsNotEmpty()
+  @IsString()
+  title: string;
+
+  imageFile: {
+    filename: string;
+    path: string;
+  } | null;
+}

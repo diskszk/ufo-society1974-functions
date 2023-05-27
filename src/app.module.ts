@@ -6,6 +6,7 @@ import { UsersModule } from "./users/users.module";
 import { AlbumsModule } from "./albums/albums.module";
 import { SongsModule } from "./songs/songs.module";
 import { AccessCountModule } from "./access-count/access-count.module";
+import { DraftAlbumsModule } from "./draft-albums/draft-albums.module";
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AccessCountModule } from "./access-count/access-count.module";
     AlbumsModule,
     SongsModule,
     AccessCountModule,
+    DraftAlbumsModule,
   ],
 })
 export class AppModule {}
