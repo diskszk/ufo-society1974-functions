@@ -7,7 +7,11 @@ import { DraftAlbumsModule } from "./draft-albums.module";
 import { AlbumsService } from "../albums/albums.service";
 import { AlbumsModule } from "../albums/albums.module";
 
-export class DummyDraftAlbumsService {
+class DummyDraftAlbumsService {
+  async isExist(id: string): Promise<boolean> {
+    return mockData.albums.find((album) => album.id === id) ? true : false;
+  }
+
   async findAll() {
     return mockData.albums.filter(({ published }) => published === false);
   }
@@ -31,9 +35,15 @@ export class DummyDraftAlbumsService {
   async delete(albumId: string): Promise<FirebaseFirestore.WriteResult> {
     return null;
   }
+}
 
-  async setPublish(
-    albumId: string
+class DummyPublishedAlbumService {
+  async findById(id: string) {
+    return mockData.albums.find((album) => album.id === id) || null;
+  }
+
+  async create(
+    albumDTO: CreateAlbumDTO
   ): Promise<FirebaseFirestore.DocumentReference<CreateAlbumDTO>> {
     return null;
   }
@@ -50,9 +60,12 @@ describe("AlbumsController", () => {
     })
       .overrideProvider(DraftAlbumsService)
       .useClass(DummyDraftAlbumsService)
+      .overrideProvider(AlbumsService)
+      .useClass(DummyPublishedAlbumService)
       .compile();
 
     draftAlbumsService = module.get<DraftAlbumsService>(DraftAlbumsService);
+    publishedAlbumsService = module.get<AlbumsService>(AlbumsService);
 
     draftAlbumsController = new DraftAlbumsController(
       draftAlbumsService,
@@ -82,7 +95,13 @@ describe("AlbumsController", () => {
     });
   });
 
-  // describe("updateDraftAlbum", () => {});
+  describe("updateDraftAlbum", () => {
+    it("IDと一致するアルバムが存在しない場合、エラーを発生させること", async () => {
+      await expect(
+        draftAlbumsController.deleteDraftAlbum("test999")
+      ).rejects.toThrow(/IDと一致するアルバムは存在しません。/);
+    });
+  });
 
   describe("deleteDraftAlbum", () => {
     it("IDと一致するアルバムが存在しない場合、エラーを発生させること", async () => {
@@ -92,5 +111,17 @@ describe("AlbumsController", () => {
     });
   });
 
-  // describe("setPublish", () => {});
+  describe("publishDraftAlbum", () => {
+    it("IDと一致するアルバムが存在しない場合、エラーを発生させること", async () => {
+      await expect(
+        draftAlbumsController.publishDraftAlbum("test999")
+      ).rejects.toThrow(/IDと一致するアルバムは存在しません。/);
+    });
+
+    it("公開中である(publish-albumsに存在する)場合、エラーを発生させること", async () => {
+      await expect(
+        draftAlbumsController.publishDraftAlbum("sample01")
+      ).rejects.toThrow(/IDと一致するアルバムは既に公開中です。/);
+    });
+  });
 });

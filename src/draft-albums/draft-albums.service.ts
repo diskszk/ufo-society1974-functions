@@ -9,7 +9,7 @@ import { CreateAlbumDTO, UpdateAlbumDTO } from "../albums/albums.dto";
 export class DraftAlbumsService {
   private readonly db: FirebaseFirestore.Firestore;
   private readonly draftAlbumsRef: firestore.CollectionReference<firestore.DocumentData>;
-  private readonly publishedAlbumsRef: firestore.CollectionReference<firestore.DocumentData>;
+  private readonly publicAlbumsRef: firestore.CollectionReference<firestore.DocumentData>;
 
   constructor() {
     if (process.env.NODE_ENV === "test") {
@@ -18,7 +18,16 @@ export class DraftAlbumsService {
 
     this.db = firestore();
     this.draftAlbumsRef = this.db.collection(DRAFT_ALBUMS);
-    this.publishedAlbumsRef = this.db.collection(ALBUMS);
+    this.publicAlbumsRef = this.db.collection(ALBUMS);
+  }
+
+  async isExist(id: string): Promise<boolean> {
+    const snapshot = await this.draftAlbumsRef
+      .doc(id)
+      .withConverter(albumConverter)
+      .get();
+
+    return snapshot.exists;
   }
 
   async findAll(): Promise<Album[]> {
@@ -77,11 +86,13 @@ export class DraftAlbumsService {
       .delete();
   }
 
-  async publish(
-    targetAlbum: CreateAlbumDTO
-  ): Promise<firestore.DocumentReference<CreateAlbumDTO>> {
-    return await this.publishedAlbumsRef
-      .withConverter<CreateAlbumDTO>(albumConverter)
-      .add({ ...targetAlbum });
+  async publish(album: CreateAlbumDTO, id: string) {
+    return await this.db.runTransaction(async (transaction) => {
+      transaction.create(this.publicAlbumsRef.doc(), {
+        ...album,
+      });
+
+      transaction.delete(this.draftAlbumsRef.doc(id));
+    });
   }
 }

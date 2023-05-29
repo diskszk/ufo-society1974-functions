@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   NotFoundException,
   Param,
   Post,
@@ -37,6 +38,14 @@ export class DraftAlbumsController {
     private readonly publishedAlbumService: AlbumsService
   ) {}
 
+  private async checkIsExistAlbum(albumId: string): Promise<void> {
+    const isExist = await this.draftAlbumsService.isExist(albumId);
+    if (!isExist) {
+      throw new NotFoundException("IDと一致するアルバムは存在しません。");
+    }
+    return;
+  }
+
   @Get()
   async findAllDraftAlbums(): Promise<AlbumsResponse> {
     const draftedAlbums = await this.draftAlbumsService.findAll();
@@ -67,13 +76,7 @@ export class DraftAlbumsController {
     @Body() album: UpdateAlbumDTO,
     @Param("albumId") albumId: string
   ) {
-    const isExistAlbum = Boolean(
-      await this.draftAlbumsService.findById(albumId)
-    );
-
-    if (!isExistAlbum) {
-      throw new NotFoundException("IDと一致するアルバムは存在しません。");
-    }
+    await this.checkIsExistAlbum(albumId);
     return await this.draftAlbumsService.update(album);
   }
 
@@ -81,11 +84,7 @@ export class DraftAlbumsController {
   @Role(role.EDITOR)
   @UseGuards(RoleGuard)
   async deleteDraftAlbum(@Param("albumId") albumId: string) {
-    const album = await this.draftAlbumsService.findById(albumId);
-
-    if (!album) {
-      throw new NotFoundException("IDと一致するアルバムは存在しません。");
-    }
+    await this.checkIsExistAlbum(albumId);
 
     return await this.draftAlbumsService.delete(albumId);
   }
@@ -93,25 +92,20 @@ export class DraftAlbumsController {
   @Post(":albumId/publish")
   @Role(role.EDITOR)
   @UseGuards(RoleGuard)
-  async setPublish(
-    @Param("albumId") albumId: string
-  ): Promise<FirebaseFirestore.DocumentReference<CreateAlbumDTO>> {
-    const targetAlbum = await this.draftAlbumsService.findById(albumId);
+  async publishDraftAlbum(@Param("albumId") albumId: string) {
+    const targetDraftAlbum = await this.draftAlbumsService.findById(albumId);
+    await this.checkIsExistAlbum(albumId);
 
-    const isExistDraftAlbum = Boolean(targetAlbum);
+    const publishedAlbum = await this.publishedAlbumService.findById(albumId);
 
-    if (!isExistDraftAlbum) {
-      throw new NotFoundException("IDと一致するアルバムは存在しません。");
-    }
-
-    const isExistPublishedAlbum = Boolean(
-      await this.publishedAlbumService.findById(albumId)
-    );
-
-    if (isExistPublishedAlbum) {
+    if (publishedAlbum) {
       throw new BadRequestException("IDと一致するアルバムは既に公開中です。");
     }
 
-    return await this.draftAlbumsService.publish(targetAlbum);
+    try {
+      this.draftAlbumsService.publish({ ...targetDraftAlbum }, albumId);
+    } catch {
+      throw new InternalServerErrorException();
+    }
   }
 }
