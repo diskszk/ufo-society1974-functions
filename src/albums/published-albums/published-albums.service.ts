@@ -1,28 +1,41 @@
-import { Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  forwardRef,
+} from "@nestjs/common";
 import { firestore } from "firebase-admin";
 import { Album } from "ufo-society1974-definition-types";
-import { albumConverter } from "./albums.converter";
-import { CreateAlbumDTO, UpdateAlbumDTO } from "./albums.dto";
-import { ALBUMS, DRAFT_ALBUMS, PUBLISHED_DATE } from "../constants";
+import { albumConverter } from "../albums.converter";
+import { CreateAlbumDTO, UpdateAlbumDTO } from "../albums.dto";
+import {
+  PUBLISHED_ALBUMS,
+  DRAFT_ALBUMS,
+  PUBLISHED_DATE,
+} from "../../constants";
+import { DraftAlbumsService } from "../draft-albums/draft-albums.service";
 
 @Injectable()
-export class AlbumsService {
+export class PublishedAlbumsService {
   private readonly db: FirebaseFirestore.Firestore;
-  private readonly albumsRef: firestore.CollectionReference<firestore.DocumentData>;
+  private readonly publishedAlbumsRef: firestore.CollectionReference<firestore.DocumentData>;
   private readonly draftAlbumsRef: firestore.CollectionReference<firestore.DocumentData>;
 
-  constructor() {
+  constructor(
+    @Inject(forwardRef(() => DraftAlbumsService))
+    private draftAlbums: DraftAlbumsService
+  ) {
     if (process.env.NODE_ENV === "test") {
       return;
     }
 
     this.db = firestore();
-    this.albumsRef = this.db.collection(ALBUMS);
+    this.publishedAlbumsRef = this.db.collection(PUBLISHED_ALBUMS);
     this.draftAlbumsRef = this.db.collection(DRAFT_ALBUMS);
   }
 
   async isExist(id: string): Promise<boolean> {
-    const snapshot = await this.albumsRef
+    const snapshot = await this.publishedAlbumsRef
       .doc(id)
       .withConverter(albumConverter)
       .get();
@@ -31,7 +44,7 @@ export class AlbumsService {
   }
 
   async findAll(): Promise<Album[]> {
-    const snapshots = await this.albumsRef
+    const snapshots = await this.publishedAlbumsRef
       .withConverter<Album>(albumConverter)
       .orderBy(PUBLISHED_DATE, "desc")
       .get();
@@ -48,7 +61,7 @@ export class AlbumsService {
   }
 
   async findById(id: string): Promise<Album | null> {
-    const snapshot = await this.albumsRef
+    const snapshot = await this.publishedAlbumsRef
       .doc(id)
       .withConverter(albumConverter)
       .get();
@@ -64,13 +77,13 @@ export class AlbumsService {
   async create(
     album: CreateAlbumDTO
   ): Promise<firestore.DocumentReference<CreateAlbumDTO>> {
-    return await this.albumsRef
+    return await this.publishedAlbumsRef
       .withConverter<CreateAlbumDTO>(albumConverter)
       .add({ ...album });
   }
 
   async update(album: UpdateAlbumDTO): Promise<firestore.WriteResult> {
-    return await this.albumsRef
+    return await this.publishedAlbumsRef
       .doc(album.id)
       .withConverter<UpdateAlbumDTO>(albumConverter)
       .update({
@@ -80,19 +93,26 @@ export class AlbumsService {
   }
 
   async delete(albumId: string): Promise<firestore.WriteResult> {
-    return await this.albumsRef
+    return await this.publishedAlbumsRef
       .doc(albumId)
       .withConverter(albumConverter)
       .delete();
   }
 
   async unpublish(album: CreateAlbumDTO, id: string) {
+    // draft-albumsに存在する場合エラー
+    const isExistInDraftAlbums = await this.draftAlbums.isExist(id);
+
+    if (isExistInDraftAlbums) {
+      return Promise.reject(new BadRequestException());
+    }
+
     return this.db.runTransaction(async (transaction) => {
       transaction.create(this.draftAlbumsRef.doc(), {
         ...album,
       });
 
-      transaction.delete(this.albumsRef.doc(id));
+      transaction.delete(this.publishedAlbumsRef.doc(id));
     });
   }
 }

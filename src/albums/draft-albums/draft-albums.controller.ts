@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
   InternalServerErrorException,
   NotFoundException,
   Param,
@@ -12,14 +13,13 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { Album } from "ufo-society1974-definition-types";
-import { AuthGuard } from "../auth/auth.guard";
-import { role } from "../constants";
-import { Role } from "../decorators/role.decorator";
-import { RoleGuard } from "../role/role.guard";
-import { SongSummary } from "../types";
-import { CreateAlbumDTO, UpdateAlbumDTO } from "../albums/albums.dto";
+import { AuthGuard } from "../../auth/auth.guard";
+import { role } from "../../constants";
+import { Role } from "../../decorators/role.decorator";
+import { RoleGuard } from "../../role/role.guard";
+import { SongSummary } from "../../types";
+import { CreateAlbumDTO, UpdateAlbumDTO } from "../albums.dto";
 import { DraftAlbumsService } from "./draft-albums.service";
-import { AlbumsService } from "../albums/albums.service";
 
 interface AlbumsResponse {
   albums: Album[];
@@ -33,10 +33,7 @@ interface AlbumsResponse {
 @Controller("draft-albums")
 @UseGuards(AuthGuard)
 export class DraftAlbumsController {
-  constructor(
-    private readonly draftAlbumsService: DraftAlbumsService,
-    private readonly publishedAlbumService: AlbumsService
-  ) {}
+  constructor(private readonly draftAlbumsService: DraftAlbumsService) {}
 
   private async checkIsExistAlbum(albumId: string): Promise<void> {
     const isExist = await this.draftAlbumsService.isExist(albumId);
@@ -98,19 +95,18 @@ export class DraftAlbumsController {
   async publishDraftAlbum(@Param("albumId") albumId: string) {
     await this.checkIsExistAlbum(albumId);
 
-    const isExistInPublishedAlbums = await this.publishedAlbumService.isExist(
-      albumId
-    );
-
-    if (isExistInPublishedAlbums) {
-      throw new BadRequestException("IDと一致するアルバムは既に公開中です。");
-    }
-
     const targetDraftAlbum = await this.draftAlbumsService.findById(albumId);
 
     try {
       this.draftAlbumsService.publish({ ...targetDraftAlbum }, albumId);
-    } catch {
+    } catch (error) {
+      if (error instanceof HttpException) {
+        if (error.getStatus() === 400) {
+          throw new BadRequestException(
+            "IDと一致するアルバムは既に公開中です。"
+          );
+        }
+      }
       throw new InternalServerErrorException();
     }
   }

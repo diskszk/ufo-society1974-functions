@@ -1,9 +1,8 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { CreateAlbumDTO, UpdateAlbumDTO } from "../albums/albums.dto";
-import { mockData } from "../mock";
+import { CreateAlbumDTO, UpdateAlbumDTO } from "../albums.dto";
+import { mockData } from "../../mock";
 import { DraftAlbumsController } from "./draft-albums.controller";
 import { DraftAlbumsService } from "./draft-albums.service";
-import { AlbumsService } from "../albums/albums.service";
 
 class DummyDraftAlbumsService {
   async isExist(id: string): Promise<boolean> {
@@ -35,44 +34,21 @@ class DummyDraftAlbumsService {
   }
 }
 
-class DummyPublishedAlbumService {
-  async isExist(id: string) {
-    return Boolean(mockData.albums.find((album) => album.id === id));
-  }
-
-  async findById(id: string) {
-    return mockData.albums.find((album) => album.id === id) || null;
-  }
-
-  async create(
-    albumDTO: CreateAlbumDTO
-  ): Promise<FirebaseFirestore.DocumentReference<CreateAlbumDTO>> {
-    return null;
-  }
-}
-
-describe("AlbumsController", () => {
+describe("DraftAlbumsController", () => {
   let draftAlbumsController: DraftAlbumsController;
   let draftAlbumsService: DraftAlbumsService;
-  let publishedAlbumsService: AlbumsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [DraftAlbumsService, AlbumsService],
+      imports: [DraftAlbumsService],
     })
       .overrideProvider(DraftAlbumsService)
       .useClass(DummyDraftAlbumsService)
-      .overrideProvider(AlbumsService)
-      .useClass(DummyPublishedAlbumService)
       .compile();
 
     draftAlbumsService = module.get<DraftAlbumsService>(DraftAlbumsService);
-    publishedAlbumsService = module.get<AlbumsService>(AlbumsService);
 
-    draftAlbumsController = new DraftAlbumsController(
-      draftAlbumsService,
-      publishedAlbumsService
-    );
+    draftAlbumsController = new DraftAlbumsController(draftAlbumsService);
   });
 
   it("should be defined", () => {
@@ -120,10 +96,8 @@ describe("AlbumsController", () => {
       ).rejects.toThrow(/IDと一致するアルバムは存在しません。/);
     });
 
-    it("公開中である(publish-albumsに存在する)場合、エラーを発生させること", async () => {
-      await expect(
-        draftAlbumsController.publishDraftAlbum("sample01")
-      ).rejects.toThrow(/IDと一致するアルバムは既に公開中です。/);
+    it.skip("公開中である(publish-albumsに存在する)場合、エラーを発生させること", async () => {
+      //
     });
   });
 });

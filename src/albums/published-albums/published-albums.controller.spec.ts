@@ -1,13 +1,12 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { AlbumsService } from "./albums.service";
-import { mockData } from "../mock";
-import { AlbumsController } from "./albums.controller";
-import { SongSummary } from "../types";
-import { SongsService } from "../songs/songs.service";
-import { CreateAlbumDTO, UpdateAlbumDTO } from "./albums.dto";
-import { DraftAlbumsService } from "../draft-albums/draft-albums.service";
+import { PublishedAlbumsService } from "./published-albums.service";
+import { mockData } from "../../mock";
+import { PublishedAlbumsController } from "./published-albums.controller";
+import { SongSummary } from "../../types";
+import { SongsService } from "../../songs/songs.service";
+import { CreateAlbumDTO, UpdateAlbumDTO } from "../albums.dto";
 
-export class DummyAlbumsService {
+export class DummyPublishedAlbumsService {
   async isExist(id: string): Promise<boolean> {
     return mockData.albums.find((album) => album.id === id) ? true : false;
   }
@@ -45,44 +44,27 @@ export class DummySongsService {
   }
 }
 
-class DummyDraftAlbumsService {
-  async findById(id: string) {
-    return mockData.albums.find((album) => album.id === id) || null;
-  }
-
-  async create(
-    albumDTO: CreateAlbumDTO
-  ): Promise<FirebaseFirestore.DocumentReference<CreateAlbumDTO>> {
-    return null;
-  }
-}
-
-describe("AlbumsController", () => {
-  let albumsController: AlbumsController;
-  let albumsService: AlbumsService;
+describe("PublishedAlbumsController", () => {
+  let albumsController: PublishedAlbumsController;
+  let albumsService: PublishedAlbumsService;
   let songsService: SongsService;
-  let draftAlbumsService: DraftAlbumsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AlbumsService, SongsService, DraftAlbumsService],
+      imports: [PublishedAlbumsService, SongsService],
     })
-      .overrideProvider(AlbumsService)
-      .useClass(DummyAlbumsService)
+      .overrideProvider(PublishedAlbumsService)
+      .useClass(DummyPublishedAlbumsService)
       .overrideProvider(SongsService)
       .useClass(DummySongsService)
-      .overrideProvider(DraftAlbumsService)
-      .useClass(DummyDraftAlbumsService)
       .compile();
 
-    albumsService = module.get<AlbumsService>(AlbumsService);
+    albumsService = module.get<PublishedAlbumsService>(PublishedAlbumsService);
     songsService = module.get<SongsService>(SongsService);
-    draftAlbumsService = module.get<DraftAlbumsService>(DraftAlbumsService);
 
-    albumsController = new AlbumsController(
+    albumsController = new PublishedAlbumsController(
       albumsService,
-      songsService,
-      draftAlbumsService
+      songsService
     );
   });
 

@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
   InternalServerErrorException,
   NotFoundException,
   Param,
@@ -11,15 +12,14 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { Album } from "ufo-society1974-definition-types";
-import { SongsService } from "../songs/songs.service";
-import { SongSummary } from "../types";
-import { AlbumsService } from "./albums.service";
-import { UpdateAlbumDTO } from "./albums.dto";
-import { AuthGuard } from "../auth/auth.guard";
-import { Role } from "../decorators/role.decorator";
-import { role } from "../constants";
-import { RoleGuard } from "../role/role.guard";
-import { DraftAlbumsService } from "../draft-albums/draft-albums.service";
+import { SongsService } from "../../songs/songs.service";
+import { SongSummary } from "../../types";
+import { PublishedAlbumsService } from "./published-albums.service";
+import { UpdateAlbumDTO } from "../albums.dto";
+import { AuthGuard } from "../../auth/auth.guard";
+import { Role } from "../../decorators/role.decorator";
+import { role } from "../../constants";
+import { RoleGuard } from "../../role/role.guard";
 
 interface AlbumsResponse {
   albums: Album[];
@@ -32,15 +32,14 @@ interface AlbumsResponse {
 /* TODO: webpageからアクセスできるようCORSを設定する */
 
 @Controller("albums")
-export class AlbumsController {
+export class PublishedAlbumsController {
   constructor(
-    private readonly albumsService: AlbumsService,
-    private readonly songsService: SongsService,
-    private readonly draftAlbumsService: DraftAlbumsService // 順番変える
+    private readonly publishedAlbumsService: PublishedAlbumsService,
+    private readonly songsService: SongsService
   ) {}
 
   private async checkIsExistAlbum(albumId: string): Promise<void> {
-    const isExist = await this.albumsService.isExist(albumId);
+    const isExist = await this.publishedAlbumsService.isExist(albumId);
 
     if (!isExist) {
       throw new NotFoundException("IDと一致するアルバムは存在しません。");
@@ -50,7 +49,7 @@ export class AlbumsController {
 
   @Get()
   async findAllPublishedAlbums(): Promise<AlbumsResponse> {
-    const publishedAlbums = await this.albumsService.findAll();
+    const publishedAlbums = await this.publishedAlbumsService.findAll();
 
     return { albums: publishedAlbums };
   }
@@ -61,7 +60,7 @@ export class AlbumsController {
   ): Promise<AlbumsResponse> {
     await this.checkIsExistAlbum(albumId);
 
-    const album = await this.albumsService.findById(albumId);
+    const album = await this.publishedAlbumsService.findById(albumId);
 
     return { albums: [album] };
   }
@@ -77,7 +76,7 @@ export class AlbumsController {
   ) {
     await this.checkIsExistAlbum(albumId);
 
-    return await this.albumsService.update(album);
+    return await this.publishedAlbumsService.update(album);
   }
 
   @Get(":albumId/summaries")
@@ -86,7 +85,7 @@ export class AlbumsController {
   ): Promise<AlbumsResponse> {
     await this.checkIsExistAlbum(albumId);
 
-    const album = await this.albumsService.findById(albumId);
+    const album = await this.publishedAlbumsService.findById(albumId);
 
     const songSummaries = await this.songsService.findAllSongSummariesByAlbumId(
       albumId
@@ -106,17 +105,23 @@ export class AlbumsController {
   async unpublishAlbum(@Param("albumId") albumId: string) {
     await this.checkIsExistAlbum(albumId);
 
-    const isExistInDraftAlbums = await this.draftAlbumsService.isExist(albumId);
-
-    if (isExistInDraftAlbums) {
-      throw new BadRequestException("IDと一致するアルバムは既に非公開中です。");
-    }
-
-    const targetPublishedAlbum = await this.albumsService.findById(albumId);
+    const targetPublishedAlbum = await this.publishedAlbumsService.findById(
+      albumId
+    );
 
     try {
-      this.albumsService.unpublish({ ...targetPublishedAlbum }, albumId);
-    } catch {
+      this.publishedAlbumsService.unpublish(
+        { ...targetPublishedAlbum },
+        albumId
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        if (error.getStatus() === 400) {
+          throw new BadRequestException(
+            "IDと一致するアルバムは既に非公開中です。"
+          );
+        }
+      }
       throw new InternalServerErrorException();
     }
   }

@@ -1,9 +1,19 @@
-import { Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  forwardRef,
+} from "@nestjs/common";
 import { firestore } from "firebase-admin";
-import { ALBUMS, DRAFT_ALBUMS, PUBLISHED_DATE } from "../constants";
+import {
+  PUBLISHED_ALBUMS,
+  DRAFT_ALBUMS,
+  PUBLISHED_DATE,
+} from "../../constants";
 import { Album } from "ufo-society1974-definition-types";
-import { albumConverter } from "../albums/albums.converter";
-import { CreateAlbumDTO, UpdateAlbumDTO } from "../albums/albums.dto";
+import { albumConverter } from "../albums.converter";
+import { CreateAlbumDTO, UpdateAlbumDTO } from "../albums.dto";
+import { PublishedAlbumsService } from "../published-albums/published-albums.service";
 
 @Injectable()
 export class DraftAlbumsService {
@@ -11,14 +21,17 @@ export class DraftAlbumsService {
   private readonly draftAlbumsRef: firestore.CollectionReference<firestore.DocumentData>;
   private readonly publicAlbumsRef: firestore.CollectionReference<firestore.DocumentData>;
 
-  constructor() {
+  constructor(
+    @Inject(forwardRef(() => PublishedAlbumsService))
+    private publishedAlbumsService: PublishedAlbumsService
+  ) {
     if (process.env.NODE_ENV === "test") {
       return;
     }
 
     this.db = firestore();
     this.draftAlbumsRef = this.db.collection(DRAFT_ALBUMS);
-    this.publicAlbumsRef = this.db.collection(ALBUMS);
+    this.publicAlbumsRef = this.db.collection(PUBLISHED_ALBUMS);
   }
 
   async isExist(id: string): Promise<boolean> {
@@ -87,6 +100,15 @@ export class DraftAlbumsService {
   }
 
   async publish(album: CreateAlbumDTO, id: string) {
+    // published-albumsに存在する場合、400エラー
+    const isExistInPublishedAlbums = await this.publishedAlbumsService.isExist(
+      id
+    );
+
+    if (isExistInPublishedAlbums) {
+      return Promise.reject(new BadRequestException());
+    }
+
     return await this.db.runTransaction(async (transaction) => {
       transaction.create(this.publicAlbumsRef.doc(), {
         ...album,

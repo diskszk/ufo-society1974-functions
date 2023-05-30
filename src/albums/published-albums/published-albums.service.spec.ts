@@ -1,17 +1,20 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { mockData } from "../mock";
-import { AlbumsService } from "./albums.service";
+import { mockData } from "../../mock";
+import { PublishedAlbumsService } from "./published-albums.service";
+import { DraftAlbumsService } from "../draft-albums/draft-albums.service";
 
-describe("AlbumsService", () => {
-  let AlbumService: AlbumsService;
-  let fakeService: Partial<AlbumsService>;
+describe("PublishedAlbumsService", () => {
+  let publishedAlbumsService: PublishedAlbumsService;
+  let fakeService: Partial<PublishedAlbumsService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AlbumsService],
+      providers: [PublishedAlbumsService, DraftAlbumsService],
     }).compile();
 
-    AlbumService = module.get<AlbumsService>(AlbumsService);
+    publishedAlbumsService = module.get<PublishedAlbumsService>(
+      PublishedAlbumsService
+    );
 
     fakeService = {
       findAll: async () => {
@@ -24,7 +27,7 @@ describe("AlbumsService", () => {
   });
 
   it("should be defined", () => {
-    expect(AlbumService).toBeDefined();
+    expect(publishedAlbumsService).toBeDefined();
   });
 
   describe("findAll", () => {
