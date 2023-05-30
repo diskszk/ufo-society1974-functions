@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
-    "build": "tsc",
+    "lint:tsc": "tsc --noEmit",
+    "build": "rimraf lib && tsc",
     "build:nest": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "build:watch": "tsc --watch",

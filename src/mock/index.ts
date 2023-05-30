@@ -23,7 +23,7 @@ const mockSongs: Song[] = [
   },
 ];
 
-const mockAlbums: Album[] = [
+const mockDraftAlbums: Album[] = [
   {
     id: "sample01",
     description: "test description1",
@@ -41,12 +41,22 @@ const mockAlbums: Album[] = [
     published: false,
   },
   {
-    id: "sample03",
-    description: "test description3",
+    id: "published01",
+    description: "test description1",
     imageFile: null,
     publishedDate: "20200101",
-    title: "test title 3",
-    published: false,
+    title: "test title published 1",
+    published: true,
+  },
+];
+const mockPublishedAlbums: Album[] = [
+  {
+    id: "published01",
+    description: "test description1",
+    imageFile: null,
+    publishedDate: "20200101",
+    title: "test title published 1",
+    published: true,
   },
 ];
 
@@ -76,8 +86,9 @@ const users: User[] = [
 export const mockData = {
   songs: mockSongs,
   song: mockSongs[0],
-  albums: mockAlbums,
-  album: mockAlbums[0],
+  draftAlbums: mockDraftAlbums,
+  publishedAlbums: mockPublishedAlbums,
+  album: mockDraftAlbums[0],
   users: users,
   user: {
     editor: users[0],
