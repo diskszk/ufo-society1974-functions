@@ -6,15 +6,15 @@ import { DraftAlbumsService } from "./draft-albums.service";
 
 class DummyDraftAlbumsService {
   async isExist(id: string): Promise<boolean> {
-    return mockData.albums.find((album) => album.id === id) ? true : false;
+    return mockData.draftAlbums.find((album) => album.id === id) ? true : false;
   }
 
   async findAll() {
-    return mockData.albums;
+    return mockData.draftAlbums;
   }
 
   async findById(id: string) {
-    return mockData.albums.find((album) => album.id === id) || null;
+    return mockData.draftAlbums.find((album) => album.id === id) || null;
   }
 
   async create(
@@ -94,10 +94,6 @@ describe("DraftAlbumsController", () => {
       await expect(
         draftAlbumsController.publishDraftAlbum("test999")
       ).rejects.toThrow(/IDと一致するアルバムは存在しません。/);
-    });
-
-    it.skip("公開中である(publish-albumsに存在する)場合、エラーを発生させること", async () => {
-      //
     });
   });
 });

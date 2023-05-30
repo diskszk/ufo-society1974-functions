@@ -16,10 +16,12 @@ describe("DraftAlbumsService", () => {
 
     fakeDraftAlbumsService = {
       findAll: async () => {
-        return [...mockData.albums];
+        return [...mockData.draftAlbums];
       },
       findById: async (id: string) => {
-        return mockData.albums.find((mockAlbum) => mockAlbum.id === id) || null;
+        return (
+          mockData.draftAlbums.find((mockAlbum) => mockAlbum.id === id) || null
+        );
       },
     };
   });

@@ -18,10 +18,13 @@ describe("PublishedAlbumsService", () => {
 
     fakeService = {
       findAll: async () => {
-        return [...mockData.albums];
+        return [...mockData.publishedAlbums];
       },
       findById: async (id: string) => {
-        return mockData.albums.find((mockAlbum) => mockAlbum.id === id) || null;
+        return (
+          mockData.publishedAlbums.find((mockAlbum) => mockAlbum.id === id) ||
+          null
+        );
       },
     };
   });
@@ -33,15 +36,15 @@ describe("PublishedAlbumsService", () => {
   describe("findAll", () => {
     it("アルバム一覧を取得する", async () => {
       const albums = await fakeService.findAll();
-      expect(albums).toHaveLength(3);
+      expect(albums).toHaveLength(1);
     });
   });
 
   describe("findById", () => {
     it("IDと一致するアルバムが存在する場合、該当するアルバムを返す", async () => {
-      const album = await fakeService.findById("sample01");
-      expect(album.id).toBe("sample01");
-      expect(album.title).toBe("test title 1");
+      const album = await fakeService.findById("published01");
+      expect(album.id).toBe("published01");
+      expect(album.title).toBe("test title published 1");
     });
 
     it("IDと一致するアルバムが存在しない場合、nullを返す", async () => {

@@ -8,15 +8,16 @@ import { CreateAlbumDTO, UpdateAlbumDTO } from "../albums.dto";
 
 export class DummyPublishedAlbumsService {
   async isExist(id: string): Promise<boolean> {
-    return mockData.albums.find((album) => album.id === id) ? true : false;
+    return Boolean(mockData.publishedAlbums.find((album) => album.id === id));
   }
 
   async findAll() {
-    return mockData.albums;
+    return mockData.publishedAlbums;
   }
 
   async findById(id: string) {
-    const album = mockData.albums.find((album) => album.id === id) || null;
+    const album =
+      mockData.publishedAlbums.find((album) => album.id === id) || null;
     return album;
   }
 
@@ -45,8 +46,8 @@ export class DummySongsService {
 }
 
 describe("PublishedAlbumsController", () => {
-  let albumsController: PublishedAlbumsController;
-  let albumsService: PublishedAlbumsService;
+  let publishedAlbumsController: PublishedAlbumsController;
+  let publishedAlbumsService: PublishedAlbumsService;
   let songsService: SongsService;
 
   beforeEach(async () => {
@@ -59,39 +60,44 @@ describe("PublishedAlbumsController", () => {
       .useClass(DummySongsService)
       .compile();
 
-    albumsService = module.get<PublishedAlbumsService>(PublishedAlbumsService);
+    publishedAlbumsService = module.get<PublishedAlbumsService>(
+      PublishedAlbumsService
+    );
     songsService = module.get<SongsService>(SongsService);
 
-    albumsController = new PublishedAlbumsController(
-      albumsService,
+    publishedAlbumsController = new PublishedAlbumsController(
+      publishedAlbumsService,
       songsService
     );
   });
 
   it("should be defined", () => {
-    expect(albumsController).toBeDefined();
+    expect(publishedAlbumsController).toBeDefined();
   });
 
   describe("findAllPublishedAlbums", () => {
     it("公開済みのアルバムを全件取得する", async () => {
-      const { albums } = await albumsController.findAllPublishedAlbums();
-      expect(albums).toHaveLength(3);
+      const { albums } =
+        await publishedAlbumsController.findAllPublishedAlbums();
+      expect(albums).toHaveLength(1);
     });
   });
 
   describe("findAlbumAndSummary", () => {
     it("IDと一致するアルバムが存在する場合、該当するアルバムと楽曲の概要を返す", async () => {
-      const response = await albumsController.findAlbumAndSummary("sample01");
+      const response = await publishedAlbumsController.findAlbumAndSummary(
+        "published01"
+      );
 
       const album = response.albums[0];
       const info = response.info;
-      expect(album.id).toBe("sample01");
+      expect(album.id).toBe("published01");
       expect(info.songSummaries).toHaveLength(2);
     });
 
     it("IDと一致するアルバムが存在しない場合、エラーを発生させること", async () => {
       await expect(
-        albumsController.findAlbumAndSummary("test999")
+        publishedAlbumsController.findAlbumAndSummary("test999")
       ).rejects.toThrow(/IDと一致するアルバムは存在しません。/);
     });
   });
@@ -99,7 +105,7 @@ describe("PublishedAlbumsController", () => {
   describe("findPublishedAlbumById", () => {
     it("IDと一致するアルバムが存在しない場合、エラーを発生させること", async () => {
       await expect(
-        albumsController.findPublishedAlbumById("test999")
+        publishedAlbumsController.findPublishedAlbumById("test999")
       ).rejects.toThrow(/IDと一致するアルバムは存在しません。/);
     });
   });
