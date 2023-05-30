@@ -89,18 +89,24 @@ export class DraftAlbumsController {
     return await this.draftAlbumsService.delete(albumId);
   }
 
+  /*
+    対象のデータをpublished-albumsに作成し、draft-albumsから削除する
+  */
   @Post(":albumId/publish")
   @Role(role.EDITOR)
   @UseGuards(RoleGuard)
   async publishDraftAlbum(@Param("albumId") albumId: string) {
-    const targetDraftAlbum = await this.draftAlbumsService.findById(albumId);
     await this.checkIsExistAlbum(albumId);
 
-    const publishedAlbum = await this.publishedAlbumService.findById(albumId);
+    const isExistInPublishedAlbums = await this.publishedAlbumService.isExist(
+      albumId
+    );
 
-    if (publishedAlbum) {
+    if (isExistInPublishedAlbums) {
       throw new BadRequestException("IDと一致するアルバムは既に公開中です。");
     }
+
+    const targetDraftAlbum = await this.draftAlbumsService.findById(albumId);
 
     try {
       this.draftAlbumsService.publish({ ...targetDraftAlbum }, albumId);

@@ -3,9 +3,7 @@ import { CreateAlbumDTO, UpdateAlbumDTO } from "../albums/albums.dto";
 import { mockData } from "../mock";
 import { DraftAlbumsController } from "./draft-albums.controller";
 import { DraftAlbumsService } from "./draft-albums.service";
-import { DraftAlbumsModule } from "./draft-albums.module";
 import { AlbumsService } from "../albums/albums.service";
-import { AlbumsModule } from "../albums/albums.module";
 
 class DummyDraftAlbumsService {
   async isExist(id: string): Promise<boolean> {
@@ -13,7 +11,7 @@ class DummyDraftAlbumsService {
   }
 
   async findAll() {
-    return mockData.albums.filter(({ published }) => published === false);
+    return mockData.albums;
   }
 
   async findById(id: string) {
@@ -38,6 +36,10 @@ class DummyDraftAlbumsService {
 }
 
 class DummyPublishedAlbumService {
+  async isExist(id: string) {
+    return Boolean(mockData.albums.find((album) => album.id === id));
+  }
+
   async findById(id: string) {
     return mockData.albums.find((album) => album.id === id) || null;
   }
@@ -56,7 +58,7 @@ describe("AlbumsController", () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [DraftAlbumsModule, AlbumsModule],
+      imports: [DraftAlbumsService, AlbumsService],
     })
       .overrideProvider(DraftAlbumsService)
       .useClass(DummyDraftAlbumsService)
@@ -80,7 +82,7 @@ describe("AlbumsController", () => {
   describe("findAllDraftAlbums", () => {
     it("下書きのアルバムを全件取得する", async () => {
       const { albums } = await draftAlbumsController.findAllDraftAlbums();
-      expect(albums).toHaveLength(2);
+      expect(albums).toHaveLength(3);
     });
   });
 

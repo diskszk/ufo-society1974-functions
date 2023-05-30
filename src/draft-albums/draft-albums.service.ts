@@ -72,7 +72,7 @@ export class DraftAlbumsService {
   async update(album: UpdateAlbumDTO): Promise<firestore.WriteResult> {
     return await this.draftAlbumsRef
       .doc(album.id)
-      .withConverter<CreateAlbumDTO>(albumConverter)
+      .withConverter<UpdateAlbumDTO>(albumConverter)
       .update({
         ...album,
         updatedAt: firestore.FieldValue.serverTimestamp(),

@@ -1,20 +1,40 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { AlbumsModule } from "./albums.module";
 import { AlbumsService } from "./albums.service";
 import { mockData } from "../mock";
 import { AlbumsController } from "./albums.controller";
 import { SongSummary } from "../types";
-import { SongsModule } from "../songs/songs.module";
 import { SongsService } from "../songs/songs.service";
+import { CreateAlbumDTO, UpdateAlbumDTO } from "./albums.dto";
+import { DraftAlbumsService } from "../draft-albums/draft-albums.service";
 
 export class DummyAlbumsService {
-  async findPublished() {
-    return mockData.albums.filter(({ published }) => published);
+  async isExist(id: string): Promise<boolean> {
+    return mockData.albums.find((album) => album.id === id) ? true : false;
+  }
+
+  async findAll() {
+    return mockData.albums;
   }
 
   async findById(id: string) {
     const album = mockData.albums.find((album) => album.id === id) || null;
     return album;
+  }
+
+  async create(
+    albumDTO: CreateAlbumDTO
+  ): Promise<FirebaseFirestore.DocumentReference<CreateAlbumDTO>> {
+    return null;
+  }
+
+  async update(
+    albumDTO: UpdateAlbumDTO
+  ): Promise<FirebaseFirestore.WriteResult> {
+    return null;
+  }
+
+  async delete(albumId: string): Promise<FirebaseFirestore.WriteResult> {
+    return null;
   }
 }
 
@@ -25,25 +45,45 @@ export class DummySongsService {
   }
 }
 
+class DummyDraftAlbumsService {
+  async findById(id: string) {
+    return mockData.albums.find((album) => album.id === id) || null;
+  }
+
+  async create(
+    albumDTO: CreateAlbumDTO
+  ): Promise<FirebaseFirestore.DocumentReference<CreateAlbumDTO>> {
+    return null;
+  }
+}
+
 describe("AlbumsController", () => {
   let albumsController: AlbumsController;
   let albumsService: AlbumsService;
   let songsService: SongsService;
+  let draftAlbumsService: DraftAlbumsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AlbumsModule, SongsModule],
+      imports: [AlbumsService, SongsService, DraftAlbumsService],
     })
       .overrideProvider(AlbumsService)
       .useClass(DummyAlbumsService)
       .overrideProvider(SongsService)
       .useClass(DummySongsService)
+      .overrideProvider(DraftAlbumsService)
+      .useClass(DummyDraftAlbumsService)
       .compile();
 
     albumsService = module.get<AlbumsService>(AlbumsService);
     songsService = module.get<SongsService>(SongsService);
+    draftAlbumsService = module.get<DraftAlbumsService>(DraftAlbumsService);
 
-    albumsController = new AlbumsController(albumsService, songsService);
+    albumsController = new AlbumsController(
+      albumsService,
+      songsService,
+      draftAlbumsService
+    );
   });
 
   it("should be defined", () => {
@@ -53,7 +93,7 @@ describe("AlbumsController", () => {
   describe("findAllPublishedAlbums", () => {
     it("公開済みのアルバムを全件取得する", async () => {
       const { albums } = await albumsController.findAllPublishedAlbums();
-      expect(albums).toHaveLength(1);
+      expect(albums).toHaveLength(3);
     });
   });
 
@@ -72,10 +112,12 @@ describe("AlbumsController", () => {
         albumsController.findAlbumAndSummary("test999")
       ).rejects.toThrow(/IDと一致するアルバムは存在しません。/);
     });
+  });
 
-    it("IDと一致するアルバムが公開中でない場合、エラーを発生させること", async () => {
+  describe("findPublishedAlbumById", () => {
+    it("IDと一致するアルバムが存在しない場合、エラーを発生させること", async () => {
       await expect(
-        albumsController.findAlbumAndSummary("sample02")
+        albumsController.findPublishedAlbumById("test999")
       ).rejects.toThrow(/IDと一致するアルバムは存在しません。/);
     });
   });

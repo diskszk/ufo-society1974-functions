@@ -2,14 +2,14 @@ import { Injectable } from "@nestjs/common";
 import { firestore } from "firebase-admin";
 import { Album } from "ufo-society1974-definition-types";
 import { albumConverter } from "./albums.converter";
-import { CreateAlbumDTO } from "./albums.dto";
-import { ALBUMS, PUBLISHED_DATE } from "../constants";
+import { CreateAlbumDTO, UpdateAlbumDTO } from "./albums.dto";
+import { ALBUMS, DRAFT_ALBUMS, PUBLISHED_DATE } from "../constants";
 
-// get のみ実装する
 @Injectable()
 export class AlbumsService {
   private readonly db: FirebaseFirestore.Firestore;
   private readonly albumsRef: firestore.CollectionReference<firestore.DocumentData>;
+  private readonly draftAlbumsRef: firestore.CollectionReference<firestore.DocumentData>;
 
   constructor() {
     if (process.env.NODE_ENV === "test") {
@@ -18,9 +18,19 @@ export class AlbumsService {
 
     this.db = firestore();
     this.albumsRef = this.db.collection(ALBUMS);
+    this.draftAlbumsRef = this.db.collection(DRAFT_ALBUMS);
   }
 
-  public async findAllAlbums(): Promise<Album[]> {
+  async isExist(id: string): Promise<boolean> {
+    const snapshot = await this.albumsRef
+      .doc(id)
+      .withConverter(albumConverter)
+      .get();
+
+    return snapshot.exists;
+  }
+
+  async findAll(): Promise<Album[]> {
     const snapshots = await this.albumsRef
       .withConverter<Album>(albumConverter)
       .orderBy(PUBLISHED_DATE, "desc")
@@ -35,20 +45,6 @@ export class AlbumsService {
 
       return { ...doc };
     });
-  }
-
-  async findPublished(): Promise<Album[]> {
-    const allAlbums = await this.findAllAlbums();
-
-    // firestoreのwhere句でフィルタリングしようとすると500エラーになる為filterで回避する
-    return allAlbums.filter(({ published }) => published === true);
-  }
-
-  async findDrafted(): Promise<Album[]> {
-    const allAlbums = await this.findAllAlbums();
-
-    // firestoreのwhere句でフィルタリングしようとすると500エラーになる為filterで回避する
-    return allAlbums.filter(({ published }) => published === false);
   }
 
   async findById(id: string): Promise<Album | null> {
@@ -73,18 +69,14 @@ export class AlbumsService {
       .add({ ...album });
   }
 
-  async setPublish(albumId: string): Promise<firestore.WriteResult> {
+  async update(album: UpdateAlbumDTO): Promise<firestore.WriteResult> {
     return await this.albumsRef
-      .doc(albumId)
-      .withConverter(albumConverter)
-      .update({ published: true });
-  }
-
-  async setUnpublish(albumId: string): Promise<firestore.WriteResult> {
-    return await this.albumsRef
-      .doc(albumId)
-      .withConverter(albumConverter)
-      .update({ published: false });
+      .doc(album.id)
+      .withConverter<UpdateAlbumDTO>(albumConverter)
+      .update({
+        ...album,
+        updatedAt: firestore.FieldValue.serverTimestamp(),
+      });
   }
 
   async delete(albumId: string): Promise<firestore.WriteResult> {
@@ -92,5 +84,15 @@ export class AlbumsService {
       .doc(albumId)
       .withConverter(albumConverter)
       .delete();
+  }
+
+  async unpublish(album: CreateAlbumDTO, id: string) {
+    return this.db.runTransaction(async (transaction) => {
+      transaction.create(this.draftAlbumsRef.doc(), {
+        ...album,
+      });
+
+      transaction.delete(this.albumsRef.doc(id));
+    });
   }
 }
