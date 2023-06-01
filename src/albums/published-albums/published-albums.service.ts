@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Inject,
   Injectable,
+  InternalServerErrorException,
   forwardRef,
 } from "@nestjs/common";
 import { firestore } from "firebase-admin";
@@ -104,15 +105,21 @@ export class PublishedAlbumsService {
     const isExistInDraftAlbums = await this.draftAlbums.isExist(id);
 
     if (isExistInDraftAlbums) {
-      return Promise.reject(new BadRequestException());
+      return Promise.reject(
+        new BadRequestException("IDと一致するアルバムは既に非公開中です。")
+      );
     }
 
-    return this.db.runTransaction(async (transaction) => {
-      transaction.create(this.draftAlbumsRef.doc(), {
-        ...album,
-      });
+    try {
+      return this.db.runTransaction(async (transaction) => {
+        transaction.create(this.draftAlbumsRef.doc(), {
+          ...album,
+        });
 
-      transaction.delete(this.publishedAlbumsRef.doc(id));
-    });
+        transaction.delete(this.publishedAlbumsRef.doc(id));
+      });
+    } catch {
+      return Promise.reject(new InternalServerErrorException());
+    }
   }
 }

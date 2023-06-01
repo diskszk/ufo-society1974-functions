@@ -1,9 +1,7 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
-  HttpException,
   InternalServerErrorException,
   NotFoundException,
   Param,
@@ -110,17 +108,13 @@ export class PublishedAlbumsController {
     );
 
     try {
-      this.publishedAlbumsService.unpublish(
+      return this.publishedAlbumsService.unpublish(
         { ...targetPublishedAlbum },
         albumId
       );
     } catch (error) {
-      if (error instanceof HttpException) {
-        if (error.getStatus() === 400) {
-          throw new BadRequestException(
-            "IDと一致するアルバムは既に非公開中です。"
-          );
-        }
+      if (error instanceof Error) {
+        throw new Error(error.message);
       }
       throw new InternalServerErrorException();
     }

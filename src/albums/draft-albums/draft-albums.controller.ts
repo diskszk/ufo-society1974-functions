@@ -1,10 +1,8 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
-  HttpException,
   InternalServerErrorException,
   NotFoundException,
   Param,
@@ -98,14 +96,10 @@ export class DraftAlbumsController {
     const targetDraftAlbum = await this.draftAlbumsService.findById(albumId);
 
     try {
-      this.draftAlbumsService.publish({ ...targetDraftAlbum }, albumId);
+      return this.draftAlbumsService.publish({ ...targetDraftAlbum }, albumId);
     } catch (error) {
-      if (error instanceof HttpException) {
-        if (error.getStatus() === 400) {
-          throw new BadRequestException(
-            "IDと一致するアルバムは既に公開中です。"
-          );
-        }
+      if (error instanceof Error) {
+        throw new Error(error.message);
       }
       throw new InternalServerErrorException();
     }
