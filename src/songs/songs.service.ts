@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { firestore } from "firebase-admin";
 import { Song } from "ufo-society1974-definition-types";
-import { ALBUMS, SONGS } from "../constants";
+import { PUBLISHED_ALBUMS, SONGS } from "../constants";
 import { SongSummary } from "../types";
 import { songConverter } from "./songs.converter";
 import { CreateSongDTO } from "./songs.dto";
@@ -16,7 +16,7 @@ export class SongsService {
       return;
     } else {
       this.db = firestore();
-      this.albumsRef = this.db.collection(ALBUMS);
+      this.albumsRef = this.db.collection(PUBLISHED_ALBUMS);
     }
   }
 

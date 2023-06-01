@@ -3,7 +3,8 @@ import { Module } from "@nestjs/common";
 import { AuthModule } from "./auth/auth.module";
 import { RoleModule } from "./role/role.module";
 import { UsersModule } from "./users/users.module";
-import { AlbumsModule } from "./albums/albums.module";
+import { DraftAlbumsModule } from "./albums/draft-albums/draft-albums.module";
+import { PublishedAlbumsModule } from "./albums/published-albums/published-albums.module";
 import { SongsModule } from "./songs/songs.module";
 import { AccessCountModule } from "./access-count/access-count.module";
 
@@ -12,7 +13,8 @@ import { AccessCountModule } from "./access-count/access-count.module";
     AuthModule,
     RoleModule,
     UsersModule,
-    AlbumsModule,
+    DraftAlbumsModule,
+    PublishedAlbumsModule,
     SongsModule,
     AccessCountModule,
   ],
