@@ -1,4 +1,5 @@
-import type { Album, Song, User } from "ufo-society1974-definition-types";
+import type { Album, Song } from "ufo-society1974-definition-types";
+import { User } from "../users/user.entity";
 import { role } from "../constants";
 import { RoleType } from "../types";
 

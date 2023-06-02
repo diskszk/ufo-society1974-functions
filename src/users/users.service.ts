@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { firestore } from "firebase-admin";
 import { USERS } from "../constants";
 import { userConverter } from "./users.converter";
-import { User } from "ufo-society1974-definition-types";
+import { User } from "./user.entity";
 import { CreateUserDTO } from "./users.dto";
 import * as firebase from "firebase-admin";
 
@@ -62,7 +62,7 @@ export class UsersService {
   ): Promise<firestore.DocumentReference<User>> {
     return await this.usersRef
       .withConverter(userConverter)
-      .add({ ...user, createdAt: firestore.Timestamp.now() });
+      .add({ ...user, uid: "asd" });
   }
 
   // Controllerで異常系をはじいて正常なデータしか処理しない

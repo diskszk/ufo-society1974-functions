@@ -1,5 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { User } from "ufo-society1974-definition-types";
+import { User } from "./user.entity";
 import { mockData } from "../mock";
 import { UsersController } from "./users.controller";
 import { CreateUserDTO } from "./users.dto";
@@ -60,7 +60,7 @@ describe("UsersController", () => {
 
   describe("findAllUser", () => {
     it("未削除のユーザーを全件取得する", async () => {
-      const { users } = await usersController.findAllUser();
+      const users = await usersController.findAllUser();
 
       expect(users).toHaveLength(3);
       expect(users.filter(({ isDeleted }) => isDeleted)).toHaveLength(0);
@@ -69,10 +69,8 @@ describe("UsersController", () => {
 
   describe("findUserById", () => {
     it("IDと一致するユーザーが存在する場合、該当するユーザーを取得する", async () => {
-      const res = await usersController.findUserById("testuid:editor");
-      expect(res.users).toHaveLength(1);
+      const user = await usersController.findUserById("testuid:editor");
 
-      const user = res.users[0];
       expect(user.uid).toBe("testuid:editor");
     });
 

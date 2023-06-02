@@ -20,10 +20,9 @@ server.use(cors());
 
 // Swagger用の定義を設定
 const options = new DocumentBuilder()
-  .setTitle("Swagger example")
+  .setTitle("ufo-society-1974 API")
   .setDescription("The API description")
   .setVersion("1.0")
-  .addTag("test")
   .build();
 
 const promiseApplicationReady = NestFactory.create(
@@ -33,7 +32,8 @@ const promiseApplicationReady = NestFactory.create(
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup("specs", app, document);
+  // api/swagger に仕様を表示する
+  SwaggerModule.setup("swagger", app, document);
   return app.init();
 });
 
