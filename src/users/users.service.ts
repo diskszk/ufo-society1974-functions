@@ -22,7 +22,9 @@ export class UsersService {
 
   async findAll(): Promise<User[]> {
     // 未削除のユーザーのみを取得する
-    const snapshots = await this.usersRef.withConverter(userConverter).get();
+    const snapshots = await this.usersRef
+      .withConverter<User>(userConverter)
+      .get();
 
     if (snapshots.empty) {
       return [];
@@ -35,7 +37,7 @@ export class UsersService {
         return null;
       }
 
-      return { ...doc, uid: snapshot.id };
+      return { ...doc };
     });
   }
 
@@ -43,7 +45,7 @@ export class UsersService {
   async findById(id: string): Promise<User | null> {
     const snapshot = await this.usersRef
       .doc(id)
-      .withConverter(userConverter)
+      .withConverter<User>(userConverter)
       .get();
 
     if (!snapshot.exists) {
@@ -58,7 +60,6 @@ export class UsersService {
 
     return {
       ...doc,
-      uid: snapshot.id,
     };
   }
 
@@ -76,13 +77,16 @@ export class UsersService {
 
     return await this.usersRef
       .doc(uid)
-      .withConverter(userConverter)
+      .withConverter<UpdateUserDTO>(userConverter)
       .set({ ...user });
   }
 
   async delete(id: string): Promise<firestore.WriteResult> {
-    return await this.usersRef.doc(id).withConverter(userConverter).update({
-      isDeleted: true,
-    });
+    return await this.usersRef
+      .doc(id)
+      .withConverter<User>(userConverter)
+      .update({
+        isDeleted: true,
+      });
   }
 }

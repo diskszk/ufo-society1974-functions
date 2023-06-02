@@ -12,7 +12,7 @@ import {
 } from "@nestjs/common";
 import { User } from "./user.entity";
 import { role } from "../constants";
-// import { AuthGuard } from "../auth/auth.guard";
+import { AuthGuard } from "../auth/auth.guard";
 import { CreateUserDTO, UpdateUserDTO } from "./users.dto";
 import { UsersService } from "./users.service";
 import { Role } from "../decorators/role.decorator";
@@ -29,7 +29,7 @@ import {
 
 @ApiTags("/users")
 @Controller("users")
-// @UseGuards(AuthGuard)
+@UseGuards(AuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -60,16 +60,16 @@ export class UsersController {
   }
 
   @Post()
-  // @Role(role.MASTER)
-  // @UseGuards(RoleGuard)
+  @Role(role.MASTER)
+  @UseGuards(RoleGuard)
   @ApiCreatedResponse({ description: "ユーザーを新規登録する。" })
   async createUser(@Body() user: CreateUserDTO) {
     return this.usersService.create(user);
   }
 
   @Put(":userId")
-  // @Role(role.MASTER)
-  // @UseGuards(RoleGuard)
+  @Role(role.MASTER)
+  @UseGuards(RoleGuard)
   @ApiBearerAuth()
   @ApiNoContentResponse()
   @ApiNoContentResponse({
