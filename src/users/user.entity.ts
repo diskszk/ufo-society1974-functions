@@ -14,8 +14,5 @@ export class User {
   username: string;
 
   @ApiProperty()
-  isSignedIn: boolean;
-
-  @ApiProperty()
   isDeleted: boolean;
 }

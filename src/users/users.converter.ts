@@ -16,12 +16,11 @@ export const userConverter = {
     const data = snapshot.data();
 
     return {
+      uid: snapshot.id,
       email: data.email,
-      isDeleted: data.isDeleted,
-      isSignedIn: data.isSignedIn,
-      role: data.role,
-      uid: data.uid,
       username: data.username,
+      role: data.role,
+      isDeleted: data.isDeleted,
     };
   },
 };

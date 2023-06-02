@@ -63,7 +63,6 @@ const mockPublishedAlbums: Album[] = [
 
 const createTestUser = (uid: string, role: RoleType): User => {
   return {
-    isSignedIn: false,
     uid: uid,
     username: "name:" + uid,
     role: role,

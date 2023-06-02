@@ -1,7 +1,8 @@
 import { IsBoolean, IsNotEmpty, IsString } from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, OmitType, PartialType } from "@nestjs/swagger";
+import { User } from "./user.entity";
 
-export class CreateUserDTO {
+export class CreateUserDTO extends OmitType(User, ["uid"]) {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
@@ -18,14 +19,10 @@ export class CreateUserDTO {
 
   @ApiProperty()
   @IsBoolean()
-  isSignedIn: boolean;
-
-  @ApiProperty()
-  @IsBoolean()
   isDeleted: boolean;
 }
 
-export class UpdateUserDTO {
+export class UpdateUserDTO extends PartialType(User) {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
@@ -46,10 +43,7 @@ export class UpdateUserDTO {
   role: "master" | "editor" | "watcher";
 
   @ApiProperty()
-  @IsBoolean()
-  isSignedIn: boolean;
-
-  @ApiProperty()
+  @IsNotEmpty()
   @IsBoolean()
   isDeleted: boolean;
 }
