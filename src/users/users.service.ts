@@ -2,9 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { firestore } from "firebase-admin";
 import { USERS } from "../constants";
 import { userConverter } from "./users.converter";
-import { User } from "ufo-society1974-definition-types";
-import { CreateUserDTO } from "./users.dto";
-import * as firebase from "firebase-admin";
+import { User } from "./user.entity";
+import { CreateUserDTO, UpdateUserDTO } from "./users.dto";
 
 @Injectable()
 export class UsersService {
@@ -32,14 +31,15 @@ export class UsersService {
     return snapshots.docs.map((snapshot) => {
       const doc = snapshot.data();
 
-      if (doc.isDeleted === false) {
-        return { ...doc };
+      if (doc.isDeleted) {
+        return null;
       }
 
-      return null;
+      return { ...doc, uid: snapshot.id };
     });
   }
 
+  // 未削除のユーザーのみを取得する
   async findById(id: string): Promise<User | null> {
     const snapshot = await this.usersRef
       .doc(id)
@@ -52,32 +52,37 @@ export class UsersService {
 
     const doc = snapshot.data();
 
+    if (doc.isDeleted) {
+      return null;
+    }
+
     return {
       ...doc,
+      uid: snapshot.id,
     };
   }
 
   async create(
     user: CreateUserDTO
-  ): Promise<firestore.DocumentReference<User>> {
+  ): Promise<firestore.DocumentReference<CreateUserDTO>> {
     return await this.usersRef
-      .withConverter(userConverter)
-      .add({ ...user, createdAt: firestore.Timestamp.now() });
+      .withConverter<CreateUserDTO>(userConverter)
+      .add({ ...user });
   }
 
-  // Controllerで異常系をはじいて正常なデータしか処理しない
+  async update(user: UpdateUserDTO): Promise<firestore.WriteResult> {
+    const { uid } = user;
+    delete user.uid;
+
+    return await this.usersRef
+      .doc(uid)
+      .withConverter(userConverter)
+      .set({ ...user });
+  }
+
   async delete(id: string): Promise<firestore.WriteResult> {
     return await this.usersRef.doc(id).withConverter(userConverter).update({
       isDeleted: true,
     });
-  }
-
-  async findByEmail(email: string) {
-    const auth = firebase.auth();
-    try {
-      return await auth.getUserByEmail(email);
-    } catch {
-      return null;
-    }
   }
 }

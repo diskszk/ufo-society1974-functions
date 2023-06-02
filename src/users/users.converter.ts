@@ -1,15 +1,18 @@
-import { DocumentData, FirestoreDataConverter } from "firebase-admin/firestore";
-import { User } from "ufo-society1974-definition-types";
+import { firestore } from "firebase-admin";
+import { User } from "./user.entity";
+import { CreateUserDTO, UpdateUserDTO } from "./users.dto";
 
-export const userConverter: FirestoreDataConverter<User> = {
-  toFirestore(user: User): DocumentData {
+export const userConverter = {
+  toFirestore(user: CreateUserDTO | UpdateUserDTO): firestore.DocumentData {
     return {
       ...user,
       isDeleted: false,
     };
   },
 
-  fromFirestore(snapshot): User {
+  fromFirestore(
+    snapshot: firestore.QueryDocumentSnapshot<firestore.DocumentData>
+  ): User {
     const data = snapshot.data();
 
     return {

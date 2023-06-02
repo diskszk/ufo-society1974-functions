@@ -1,4 +1,5 @@
-import type { Album, Song, User } from "ufo-society1974-definition-types";
+import type { Album, Song } from "ufo-society1974-definition-types";
+import { User } from "../users/user.entity";
 import { role } from "../constants";
 import { RoleType } from "../types";
 
@@ -78,7 +79,7 @@ const deletedUser = {
 
 const users: User[] = [
   createTestUser("testuid:editor", role.EDITOR),
-  createTestUser("tesiuid:master", role.MASTER),
+  createTestUser("testuid:master", role.MASTER),
   createTestUser("testuid:watcher", role.WATCHER),
   deletedUser,
 ];

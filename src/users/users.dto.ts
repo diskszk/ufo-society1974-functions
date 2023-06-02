@@ -1,25 +1,55 @@
 import { IsBoolean, IsNotEmpty, IsString } from "class-validator";
-import { User } from "ufo-society1974-definition-types";
+import { ApiProperty } from "@nestjs/swagger";
 
-export class CreateUserDTO implements User {
+export class CreateUserDTO {
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   email: string;
 
-  @IsNotEmpty()
-  role: "master" | "editor" | "watcher";
-
-  @IsNotEmpty()
-  @IsString()
-  uid: string;
-
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   username: string;
 
+  @ApiProperty()
+  @IsNotEmpty()
+  role: "master" | "editor" | "watcher";
+
+  @ApiProperty()
   @IsBoolean()
   isSignedIn: boolean;
 
+  @ApiProperty()
+  @IsBoolean()
+  isDeleted: boolean;
+}
+
+export class UpdateUserDTO {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  uid: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  email: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  username: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  role: "master" | "editor" | "watcher";
+
+  @ApiProperty()
+  @IsBoolean()
+  isSignedIn: boolean;
+
+  @ApiProperty()
   @IsBoolean()
   isDeleted: boolean;
 }
