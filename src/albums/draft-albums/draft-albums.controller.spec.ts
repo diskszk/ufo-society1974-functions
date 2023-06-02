@@ -76,6 +76,7 @@ describe("DraftAlbumsController", () => {
   describe("updateDraftAlbum", () => {
     it("IDと一致するアルバムが存在しない場合、エラーを発生させること", async () => {
       await expect(
+        // TODO: updateに直す
         draftAlbumsController.deleteDraftAlbum("test999")
       ).rejects.toThrow(/IDと一致するアルバムは存在しません。/);
     });

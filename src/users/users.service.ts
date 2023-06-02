@@ -3,7 +3,7 @@ import { firestore } from "firebase-admin";
 import { USERS } from "../constants";
 import { userConverter } from "./users.converter";
 import { User } from "./user.entity";
-import { CreateUserDTO } from "./users.dto";
+import { CreateUserDTO, UpdateUserDTO } from "./users.dto";
 import * as firebase from "firebase-admin";
 
 @Injectable()
@@ -40,6 +40,7 @@ export class UsersService {
     });
   }
 
+  // 未削除のユーザーのみを取得する
   async findById(id: string): Promise<User | null> {
     const snapshot = await this.usersRef
       .doc(id)
@@ -52,6 +53,10 @@ export class UsersService {
 
     const doc = snapshot.data();
 
+    if (doc.isDeleted) {
+      return null;
+    }
+
     return {
       ...doc,
     };
@@ -63,6 +68,10 @@ export class UsersService {
     return await this.usersRef
       .withConverter(userConverter)
       .add({ ...user, uid: "asd" });
+  }
+
+  async update(user: UpdateUserDTO) {
+    return;
   }
 
   // Controllerで異常系をはじいて正常なデータしか処理しない

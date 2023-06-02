@@ -53,12 +53,7 @@ export class UsersController {
     const targetUser = await this.usersService.findById(userId);
 
     if (!targetUser) {
-      throw new NotFoundException("指定されたユーザーは存在しません。");
-    }
-
-    // 削除済みということなので404
-    if (targetUser.isDeleted) {
-      throw new NotFoundException("指定されたユーザーは存在しません。");
+      throw new NotFoundException("IDと一致するユーザーは存在しません。");
     }
 
     return { ...targetUser };
@@ -67,38 +62,33 @@ export class UsersController {
   @Post()
   @Role(role.MASTER)
   @UseGuards(RoleGuard)
-  @ApiCreatedResponse({ description: "ユーザーの登録に成功する" })
-  @ApiBadRequestResponse({
-    description: "入力したメールアドレスは既に使われています。",
-  })
+  @ApiCreatedResponse({ description: "ユーザーを新規登録する。" })
   async createUser(@Body() user: CreateUserDTO) {
-    const findByEmailResult = await this.usersService.findByEmail(user.email);
-
-    if (findByEmailResult) {
-      throw new BadRequestException(
-        "入力したメールアドレスは既に使われています。"
-      );
-    }
-
     return this.usersService.create(user);
   }
 
-  @Put(":uid")
+  @Put(":userId")
   @Role(role.MASTER)
   @UseGuards(RoleGuard)
   @ApiBearerAuth()
   @ApiNoContentResponse()
   @ApiNoContentResponse({
-    description: "ユーザーの更新に成功する",
+    description: "ユーザーの情報を変更する。",
   })
   @ApiNotFoundResponse({
     description: "IDと一致するユーザーは存在しません。",
   })
   async updateUser(@Body() user: UpdateUserDTO) {
-    return;
+    const targetUser = await this.usersService.findById(user.uid);
+
+    if (!targetUser) {
+      throw new NotFoundException("IDと一致するユーザーは存在しません。");
+    }
+
+    return this.usersService.update(user);
   }
 
-  // 論理削除だがクライアントからみたら削除なのでHTTP DELETEメソッドでよさそう
+  // 論理削除(update)だがクライアントからみたら削除なのでHTTP DELETEメソッドを使う
   @Delete(":userId")
   @Role(role.MASTER)
   @UseGuards(RoleGuard)
@@ -113,17 +103,14 @@ export class UsersController {
     const targetUser = await this.usersService.findById(userId);
 
     if (!targetUser) {
-      throw new NotFoundException("指定されたユーザーは存在しません。");
+      throw new NotFoundException("IDと一致するユーザーは存在しません。");
     }
 
     // roleがmasterのユーザーは消せない
     if (targetUser.role === role.MASTER) {
-      throw new BadRequestException();
-    }
-
-    // すでに削除済みの場合400エラー
-    if (targetUser.isDeleted) {
-      throw new BadRequestException();
+      throw new BadRequestException(
+        "IDと一致するユーザーは管理者のため削除できません。"
+      );
     }
 
     return await this.usersService.delete(userId);

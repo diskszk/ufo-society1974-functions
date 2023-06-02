@@ -9,12 +9,12 @@ export class CreateUserDTO {
 
   @ApiProperty()
   @IsNotEmpty()
-  role: "master" | "editor" | "watcher";
+  @IsString()
+  username: string;
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsString()
-  username: string;
+  role: "master" | "editor" | "watcher";
 
   @ApiProperty()
   @IsBoolean()
@@ -29,21 +29,21 @@ export class UpdateUserDTO {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  email: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  role: "master" | "editor" | "watcher";
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
   uid: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
+  email: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
   username: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  role: "master" | "editor" | "watcher";
 
   @ApiProperty()
   @IsBoolean()

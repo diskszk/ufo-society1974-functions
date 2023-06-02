@@ -79,7 +79,7 @@ const deletedUser = {
 
 const users: User[] = [
   createTestUser("testuid:editor", role.EDITOR),
-  createTestUser("tesiuid:master", role.MASTER),
+  createTestUser("testuid:master", role.MASTER),
   createTestUser("testuid:watcher", role.WATCHER),
   deletedUser,
 ];

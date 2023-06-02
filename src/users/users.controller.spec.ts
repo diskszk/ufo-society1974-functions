@@ -1,10 +1,10 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { User } from "./user.entity";
-import { mockData } from "../mock";
 import { UsersController } from "./users.controller";
-import { CreateUserDTO } from "./users.dto";
+import { CreateUserDTO, UpdateUserDTO } from "./users.dto";
 import { UsersModule } from "./users.module";
 import { UsersService } from "./users.service";
+import { mockData } from "../mock";
 
 class DummyUsersService {
   async findAll(): Promise<User[]> {
@@ -16,14 +16,14 @@ class DummyUsersService {
       case "testuid:editor": {
         return mockData.user.editor;
       }
-      case "tsetuid:master": {
+      case "testuid:master": {
         return mockData.user.master;
       }
       case "testuid:watcher": {
         return mockData.user.watcher;
       }
       case "testuid:deleted": {
-        return mockData.user.deletedUser;
+        return null;
       }
       default: {
         return null;
@@ -31,16 +31,20 @@ class DummyUsersService {
     }
   }
 
-  async create(userDTO: CreateUserDTO) {
+  async create(_userDTO: CreateUserDTO) {
     return null;
   }
 
-  async delete(id: string) {
+  async update(_usrDTO: UpdateUserDTO) {
+    return null;
+  }
+
+  async delete(_id: string) {
     return null;
   }
 }
 
-describe("UsersController", () => {
+describe("/users", () => {
   let usersController: UsersController;
 
   beforeEach(async () => {
@@ -58,7 +62,7 @@ describe("UsersController", () => {
     expect(usersController).toBeDefined();
   });
 
-  describe("findAllUser", () => {
+  describe("/ (GET) => User[]", () => {
     it("未削除のユーザーを全件取得する", async () => {
       const users = await usersController.findAllUser();
 
@@ -67,43 +71,60 @@ describe("UsersController", () => {
     });
   });
 
-  describe("findUserById", () => {
+  describe("/:id (GET) => User", () => {
     it("IDと一致するユーザーが存在する場合、該当するユーザーを取得する", async () => {
       const user = await usersController.findUserById("testuid:editor");
 
       expect(user.uid).toBe("testuid:editor");
     });
 
-    it("IDと一致するユーザーが存在しない場合、404エラーを発生させる", async () => {
+    it("IDと一致するユーザーが存在しない場合、エラーを発生させる", async () => {
       await expect(usersController.findUserById("999")).rejects.toThrow(
-        /指定されたユーザーは存在しません。/
+        /IDと一致するユーザーは存在しません。/
       );
     });
 
-    it("IDと一致するユーザーが削除済みの場合、該当するユーザーを取得せず404エラーを発生させる", async () => {
+    it("IDと一致するユーザーが削除済みの場合、エラーを発生させる", async () => {
       await expect(
         usersController.findUserById("testuid:deleted")
-      ).rejects.toThrow(/指定されたユーザーは存在しません。/);
+      ).rejects.toThrow(/IDと一致するユーザーは存在しません。/);
     });
   });
 
-  describe("deleteUser", () => {
-    it("IDと一致するユーザーが存在しない場合、403エラーを発生させる", async () => {
-      await expect(usersController.deleteUser("999")).rejects.toThrow(
-        /指定されたユーザーは存在しません。/
+  describe("/:id (UPDATE)", () => {
+    it("IDと一致するユーザーが存在しない場合、エラーを発生させる", async () => {
+      const mockUser = mockData.user.editor;
+      mockUser.uid = "999";
+      await expect(usersController.updateUser(mockUser)).rejects.toThrow(
+        /IDと一致するユーザーは存在しません。/
       );
     });
 
-    it("IDと一致するユーザーが既に削除済(論理削除)の場合、削除を行わずに400エラーを発生させる", async () => {
-      await expect(
-        usersController.deleteUser("testuid:deleted")
-      ).rejects.toThrow();
+    it("IDと一致するユーザーが既に削除済みの場合、エラーを発生させる", async () => {
+      const mockUser = mockData.user.deletedUser;
+      await expect(usersController.updateUser(mockUser)).rejects.toThrow(
+        /IDと一致するユーザーは存在しません。/
+      );
+    });
+  });
+
+  describe("/:id (DELETE)", () => {
+    it("IDと一致するユーザーが存在しない場合、エラーを発生させる", async () => {
+      await expect(usersController.deleteUser("999")).rejects.toThrow(
+        /IDと一致するユーザーは存在しません。/
+      );
     });
 
-    it("IDと一致するユーザーが管理ユーザー(master)である場合、削除を行わずに400エラーを発生させる", async () => {
+    it("IDと一致するユーザーが既に削除済の場合、エラーを発生させる", async () => {
+      await expect(
+        usersController.deleteUser("testuid:deleted")
+      ).rejects.toThrow(/IDと一致するユーザーは存在しません。/);
+    });
+
+    it("IDと一致するユーザーが管理ユーザー(master)である場合、エラーを発生させる", async () => {
       await expect(
         usersController.deleteUser("testuid:master")
-      ).rejects.toThrow();
+      ).rejects.toThrow(/IDと一致するユーザーは管理者のため削除できません。/);
     });
   });
 });
