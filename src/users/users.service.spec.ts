@@ -8,15 +8,15 @@ describe("UsersService", () => {
 
   // firebase-admin/authのUserRecord型
   // テスト環境だとfirebase-adminをimportするとエラーになるため代用する
-  const fakeUserRecord = {
-    email: "testuid:editor@mail.com",
-    uid: "testuid:editor",
-    emailVerified: false,
-    disabled: false,
-    metadata: null,
-    providerData: [],
-    toJSON: () => null,
-  };
+  // const fakeUserRecord = {
+  //   email: "testuid:editor@mail.com",
+  //   uid: "testuid:editor",
+  //   emailVerified: false,
+  //   disabled: false,
+  //   metadata: null,
+  //   providerData: [],
+  //   toJSON: () => null,
+  // };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -31,9 +31,6 @@ describe("UsersService", () => {
       },
       findById: async (id: string) => {
         return id === "testuid:editor" ? mockData.user.editor : null;
-      },
-      findByEmail: async (email: string) => {
-        return email === "testuid:editor@mail.com" ? fakeUserRecord : null;
       },
     };
   });
@@ -58,22 +55,6 @@ describe("UsersService", () => {
     it("IDと一致するユーザーが存在しない場合、nullを返す", async () => {
       const user = await fakeUsersService.findById("999");
       expect(user).toBeNull();
-    });
-  });
-
-  describe("findByEmail", () => {
-    it("emailと一致するユーザーが存在する場合、該当するユーザーを返す", async () => {
-      const findResult = await fakeUsersService.findByEmail(
-        "testuid:editor@mail.com"
-      );
-
-      expect(findResult.email).toBe("testuid:editor@mail.com");
-    });
-
-    it("emailと一致するユーザーが存在しない場合、nullを返す", async () => {
-      const findResult = await fakeUsersService.findByEmail("999");
-
-      expect(findResult).toBeNull();
     });
   });
 });
