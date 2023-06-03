@@ -6,6 +6,11 @@ export class CreateUserDTO extends OmitType(User, ["uid"]) {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
+  uid: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
   email: string;
 
   @ApiProperty()
