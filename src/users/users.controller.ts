@@ -29,11 +29,11 @@ import {
 
 @ApiTags("/users")
 @Controller("users")
-@UseGuards(AuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @UseGuards(AuthGuard)
   @ApiOkResponse({ type: [User], description: "ユーザーを全件取得する" })
   async findAllUser(): Promise<User[]> {
     const users = await this.usersService.findAll();
@@ -41,6 +41,7 @@ export class UsersController {
     return [...users];
   }
 
+  // 認証されていなくても使える
   @Get(":userId")
   @ApiOkResponse({
     type: User,
@@ -60,6 +61,7 @@ export class UsersController {
   }
 
   @Post()
+  @UseGuards(AuthGuard)
   @Role(role.MASTER)
   @UseGuards(RoleGuard)
   @ApiCreatedResponse({ description: "ユーザーを新規登録する。" })
@@ -68,6 +70,7 @@ export class UsersController {
   }
 
   @Put(":userId")
+  @UseGuards(AuthGuard)
   @Role(role.MASTER)
   @UseGuards(RoleGuard)
   @ApiBearerAuth()
@@ -90,6 +93,7 @@ export class UsersController {
 
   // 論理削除(update)だがクライアントからみたら削除なのでHTTP DELETEメソッドを使う
   @Delete(":userId")
+  @UseGuards(AuthGuard)
   @Role(role.MASTER)
   @UseGuards(RoleGuard)
   @ApiNoContentResponse()
