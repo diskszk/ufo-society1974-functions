@@ -6,7 +6,6 @@ export const userConverter = {
   toFirestore(user: CreateUserDTO | UpdateUserDTO): firestore.DocumentData {
     return {
       ...user,
-      isDeleted: false,
     };
   },
 
