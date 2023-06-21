@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from "@nestjs/common";
 import { User } from "./user.entity";
@@ -34,10 +35,24 @@ export class UsersController {
 
   @Get()
   @UseGuards(AuthGuard)
-  @ApiOkResponse({ type: [User], description: "ユーザーを全件取得する" })
-  async findAllUser(): Promise<User[]> {
+  @ApiNotFoundResponse()
+  @ApiOkResponse({
+    type: [User],
+    description: "ユーザーを全件取得する",
+  })
+  @ApiOkResponse({
+    type: User,
+    description: "メールアドレスと一致するユーザーを1件取得する",
+  })
+  async findAllUser(@Query("email") email?: string): Promise<User[] | User> {
+    if (email) {
+      const user = await this.usersService.findByEmail(email);
+      if (!user) {
+        throw new NotFoundException();
+      }
+      return user;
+    }
     const users = await this.usersService.findAll();
-
     return [...users];
   }
 
