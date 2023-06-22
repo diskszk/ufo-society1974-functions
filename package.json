@@ -21,7 +21,8 @@
     "test:f": "jest --onlyFailures",
     "test:cc": "jest --clearCache",
     "test:watch": "jest --watch",
-    "test:cov": "jest --coverage"
+    "test:cov": "jest --coverage",
+    "test:e2e": "jest --config ./src/e2e/jest-e2e.json"
   },
   "engines": {
     "node": "16"
@@ -70,6 +71,7 @@
     "@types/helmet": "^4.0.0",
     "@types/jest": "27.4.0",
     "@types/node": "^16.0.0",
+    "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.12.0",
     "@typescript-eslint/parser": "^5.12.0",
     "class-transformer": "^0.5.1",
@@ -85,6 +87,7 @@
     "jest": "^27.2.5",
     "prettier": "^2.3.2",
     "source-map-support": "^0.5.20",
+    "supertest": "^6.3.3",
     "ts-jest": "^27.0.3",
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",

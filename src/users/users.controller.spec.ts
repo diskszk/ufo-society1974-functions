@@ -64,7 +64,7 @@ describe("/users", () => {
 
   describe("/ (GET) => User[]", () => {
     it("未削除のユーザーを全件取得する", async () => {
-      const users = await usersController.findAllUser();
+      const users = (await usersController.findAllUser()) as User[];
 
       expect(users).toHaveLength(3);
       expect(users.filter(({ isDeleted }) => isDeleted)).toHaveLength(0);

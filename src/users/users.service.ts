@@ -41,6 +41,12 @@ export class UsersService {
     });
   }
 
+  async findByEmail(email: string): Promise<User | null> {
+    const users = await this.findAll();
+
+    return users.find((user) => user.email === email);
+  }
+
   // 未削除のユーザーのみを取得する
   async findById(id: string): Promise<User | null> {
     const snapshot = await this.usersRef
@@ -63,12 +69,8 @@ export class UsersService {
     };
   }
 
-  async create(
-    user: CreateUserDTO
-  ): Promise<firestore.DocumentReference<CreateUserDTO>> {
-    return await this.usersRef
-      .withConverter<CreateUserDTO>(userConverter)
-      .add({ ...user });
+  async create(user: CreateUserDTO) {
+    return await this.usersRef.doc(user.uid).set({ ...user });
   }
 
   async update(user: UpdateUserDTO): Promise<firestore.WriteResult> {
